@@ -1,0 +1,11 @@
+{%extends "base.html"%}
+
+{%block content%}
+{%load static%}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="ejemplo">
+    <button class="btn btn-danger" type="submit">Importar usuarios</button>
+  </form>
+
+  {% endblock %}

@@ -12,8 +12,10 @@ urlpatterns = [
     path('registro/', views.registro_view, name='Registro'),
     path('coordinador/', views.coordinador_view, name='Coordinador'),
     path('<str:email>/', views.desactivar_usuario, name='desactivar_usuario'),
+    path('editar_usuario', views.edit_user, name='EditarUsuario'),
     path('activardesactivar', views.activarusuarios_view, name='ActivarDesactivar'),
-    path('cargar_usuarios/', views.cargar_usuarios, name='cargar_usuarios'),
+    path('cargar', views.cargar_usuarios, name='Cargar'),
+    
     
  
     

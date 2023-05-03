@@ -42,7 +42,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                   <!-- CAMBIAR POR LOGO <i class="fas fa-laugh-wink"></i> --> 
                 </div>
-                <div class="sidebar-brand-text mx-3">UNIVERSIDA DEL VALLE</div>
+                <div class="sidebar-brand-text mx-3">UNIVERSIDAD DEL VALLE</div>
             </a>
 
             <!-- Divider -->
@@ -70,12 +70,14 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">ACCIONES:</h6>
-                        {% if perms.inicio.can_view_group%}
-                        <a class="collapse-item" href="{%url 'Registro'%}">REGISTRAR</a>
-                        <a class="collapse-item" href="{%url 'Usuarios'%}">MOSTRAR</a>
-                        <a class="collapse-item" href="{%url 'ActivarDesactivar'%}">DESACTIVAR</a>
-                        {%endif%}
-                        <a class="collapse-item" href="cards.html">EDITAR</a>
+                        {% if perms.auth.add_group %}
+                        <a class="collapse-item" href="{%url 'Registro'%}">REGISTRAR USUARIOS</a>
+                        <a class="collapse-item" href="{%url 'Usuarios'%}">MOSTRAR USUARIOS</a>
+                        <a class="collapse-item" href="{%url 'ActivarDesactivar'%}">DESACTIVAR USUARIOS</a>
+                        <a class="collapse-item" href="{%url 'Cargar'%}">CARGAR USUARIOS</a>
+                        {% endif %}
+                        <a class="collapse-item" href="{%url 'EditarUsuario'%}">EDITAR USUARIO</a>
+
                     </div>
                 </div>
                 
@@ -93,13 +95,19 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">OPCIONES:</h6>
-                        
-                        <a class="collapse-item" href="utilities-color.html">SOLICITAR</a>
-                        {% if perms.inicio.Can_view_group %} 
+                       
+                      
+                        {% if perms.auth.view_group %}
+                        <a class="collapse-item" href="utilities-color.html">SOLICITAR/ACTIVAR</a>
+                        {% endif %}
+                        {% if perms.auth.change_group %}
                         <a class="collapse-item" href="utilities-animation.html">DILIGENCIAR</a>
-                        <a class="collapse-item" href="utilities-border.html">ACTIVAR </a>
+                        {% endif %}
+                        {% if perms.auth.add_group %}
                         <a class="collapse-item" href="utilities-border.html">DESACTIVAR </a>
-                        <a class="collapse-item" href="utilities-other.html">Other</a>
+                        {% endif %}
+                        {% if perms.auth.delete_group %}
+                        <a class="collapse-item" href="utilities-other.html">REPORTE</a>
                         {% endif %}
                     </div>
                 </div>
