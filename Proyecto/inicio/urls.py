@@ -15,9 +15,19 @@ urlpatterns = [
     path('editar_usuario', views.edit_user, name='EditarUsuario'),
     path('activardesactivar', views.activarusuarios_view, name='ActivarDesactivar'),
     path('cargar', views.cargar_usuarios, name='Cargar'),
+    path('proyeccion', views.proyeccion_view, name='Proyeccion'),
+    path('enviar-mensaje', views.enviar_mensaje, name='enviar_mensaje'),
+    path('buzon-mensajes', views.buzon_mensajes, name='buzon_mensajes'),
+    path('export/proyeccion/excel/', views.descargar_tabla, name='descargar_tabla'),
+    path('reporte', views.reporte_view, name='Reporte'),
+    #path('<int:pk>/', views.proyeccion_edit, name='editar_proyeccion'),
+    #path('estadoProyeccion', views.estadoProyeccion, name='estadoProyeccion'),
+    #path('proyecciones/<int:id>/editar/', views.proyeccion_edit, name='proyeccion_edit'),
     
+   
     
- 
+
+   #path('int:id/', views.proyeccion_edit, name='proyeccion_edit'),
     
     
     

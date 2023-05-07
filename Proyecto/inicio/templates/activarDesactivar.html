@@ -64,7 +64,9 @@
                                         <tr>
                                           <td>{{ User.username }}</td>
                                           <td>{{ User.email }}</td>
-                                          <td>{{ User.id_rol}}</td> 
+                                          <td> {% for group in User.groups.all %}
+                                            {{ group.name}}
+                                            {% endfor %}</td> 
                                           <td>{% if User.is_active %}Activo{% else %}Desactivado{% endif %}</td>
                                         <td>   
                                             

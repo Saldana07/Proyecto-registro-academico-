@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from .models import Programas, Asignatura, Proyeccion
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         max_length=254,
@@ -67,3 +68,24 @@ class EditUserForm(forms.ModelForm):
         model = User
         fields = ['email', 'username', 'first_name', 'last_name', 'group']
         
+
+class ProyeccionForm(forms.ModelForm):
+    class Meta:
+        model = Proyeccion
+        fields = ('id_programas', 'id_asignatura',)
+        widgets = {
+            'id_programas': forms.Select(attrs={'class': 'form-control'}),
+            'id_asignatura': forms.Select(attrs={'class': 'form-control'}),
+        }
+        
+        
+class ProyeccionEditForm(forms.ModelForm):
+    class Meta:
+        model = Proyeccion
+        fields = ('id_programas', 'id_asignatura', 'total_semana', 'num_profesores')
+        widgets = {
+            'id_programas': forms.Select(attrs={'class': 'form-control'}),
+            'id_asignatura': forms.Select(attrs={'class': 'form-control'}),
+            'total_semana': forms.NumberInput(attrs={'class': 'form-control'}),
+            'num_profesores': forms.NumberInput(attrs={'class': 'form-control'}),
+        }

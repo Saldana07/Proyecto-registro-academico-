@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Lista de Proyecciones</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Programa</th>
+        <th>Asignatura</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for proyeccion in proyecciones %}
+        <tr>
+            <td>{{ proyeccion.id }}</td>
+            <td>{{ proyeccion.id_programas }}</td>
+            <td>{{ proyeccion.id_asignatura }}</td>
+            <td>
+                
+              
+                <a href="{% url 'proyeccion_edit' id=proyeccion.id %}" class="btn btn-primary">Editar</a>
+
+
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

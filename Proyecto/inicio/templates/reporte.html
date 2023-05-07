@@ -1,6 +1,7 @@
 {%extends "base.html"%}
 
 {%block content%}
+
 {%load static%}
 <div>
 <!DOCTYPE html>
@@ -31,54 +32,69 @@
 
 <body id="page-top">
 
-   
+    
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">TABLA DE USUARIOS</h1>
+                    <h1 class="h3 mb-2 text-gray-800">TABLA DE PROYECCION</h1>
                    
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-danger">USUARIOS</h6>
+                            <h6 class="m-0 font-weight-bold text-danger">PROYECCION</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+                                
                                     <thead>
-                                        
-                                         
                                         <tr>
-                                        
-                                            <th>USERNAME</th>
-                                            <th>EMAIL</th>
-                                            <th>NOMBRE</th>
-                                            <th>APELLIDO</th>
-                                            <th>ROL</th>
-
-                                            
-
-                                            
+                                            <th>Semestre</th>
+                                            <th>Código</th>
+                                            <th>Asignatura</th>
+                                            <th>Créditos</th>
+                                            <th>Intensidad</th>
+                                            <th>Total Semana</th>
+                                            <th>Número de Profesores</th>
+                                            <th>Total a Pagar</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="text-dark">
-                                        {% for User in usuarios %}
+                                    <tbody>
+                                        {% for dato in datos %}
                                         <tr>
-                                          <td>{{ User.username }}</td>
-                                          <td>{{ User.email }}</td>
-                                          <td>{{ User.first_name }}</td>
-                                          <td>{{ User.last_name }}</td>
-                                         <td>
-                                        {% for group in User.groups.all %}
-                                        {{ group.name}}
-                                        {% endfor %}
-                                         </td> 
-
+                                            <td>{{ dato.semestre }}</td>
+                                            <td>{{ dato.codigo }}</td>
+                                            <td>{{ dato.asignatura }}</td>
+                                            <td>{{ dato.creditos }}</td>
+                                            <td>{{ dato.intensidad }}</td>
+                                            <td>{{ dato.total_semana }}</td>
+                                            <td>{{ dato.num_profesores }}</td>
+                                            <td>{{ dato.total_a_pagar }}</td>
                                         </tr>
-                                      {% endfor %}
+                                        {% endfor %}
+                                        <tr>
+                                            <th>Totales</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th>{{ total_intensidad }}</th>
+                                            <th>{{ total_semana }}</th>
+                                            <th>{{ total_profesores }}</th>
+                                            <th>{{ total_pago }}</th>
+                                        </tr>
                                     </tbody>
+                               
+                                
+                                    
                                 </table>
+                        
+                                
+                                <div class="text-right">
+                                    <a href="{% url 'Proyeccion' %}" class="btn btn-danger ">HACER PROYECCION</a>
+                                <a href="{% url 'descargar_tabla' %}" class="btn btn-danger">Descargar tabla</a>
+                                </div>
                             </div>
                         </div>
                     </div>

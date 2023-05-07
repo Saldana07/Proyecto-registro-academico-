@@ -98,17 +98,20 @@
                        
                       
                         {% if perms.auth.view_group %}
-                        <a class="collapse-item" href="utilities-color.html">SOLICITAR/ACTIVAR</a>
+                        <a class="collapse-item" href="">MODIFICAR</a>
                         {% endif %}
                         {% if perms.auth.change_group %}
-                        <a class="collapse-item" href="utilities-animation.html">DILIGENCIAR</a>
+                        <a class="collapse-item" href="{%url 'Proyeccion'%}">DILIGENCIAR</a>
                         {% endif %}
                         {% if perms.auth.add_group %}
-                        <a class="collapse-item" href="utilities-border.html">DESACTIVAR </a>
+                        <a class="collapse-item" href="">DESACTIVAR </a>
                         {% endif %}
                         {% if perms.auth.delete_group %}
-                        <a class="collapse-item" href="utilities-other.html">REPORTE</a>
+                        <a class="collapse-item" href="{%url 'Reporte'%}">REPORTE</a>
                         {% endif %}
+                        <a class="collapse-item" href="{%url 'enviar_mensaje'%}">ENVIAR MENSAJE</a>
+                        <a class="collapse-item" href="{%url 'buzon_mensajes'%}">BUZON</a>
+
                     </div>
                 </div>
             </li>

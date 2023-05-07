@@ -1,0 +1,23 @@
+{%extends "base.html"%}
+
+{% block content %}
+
+<h1>Buzón de mensajes</h1>
+<ul>
+{% for mensaje in mensajes_recibidos %}
+  
+  <li>
+    <strong> De: </strong>{{ mensaje.emisor }}<br>
+    <strong> Fecha de envío:</strong> {{ mensaje.fecha_envio }}<br>
+      <strong> Contenido:</strong>  {{ mensaje.contenido }}<br>
+    {% if mensaje.archivo_adjunto %}
+    <strong> Archivo adjunto:</strong>  <a href="{{ mensaje.archivo_adjunto.url }}">{{ mensaje.archivo_adjunto.name }}</a><br>
+    <strong>-----------------------------------------------------------------------</strong>
+    {% endif %}
+  </li>
+{% empty %}
+<li> No tienes mensajes recibidos.</li>
+{% endfor %}
+<ul>
+
+{% endblock %}
