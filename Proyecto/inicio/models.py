@@ -32,6 +32,7 @@ class Proyeccion(models.Model):
     id_asignatura = models.ForeignKey(Asignatura, on_delete=models.CASCADE, null=True)
     total_semana = models.IntegerField(default=19)
     num_profesores = models.IntegerField(default=1)
+    semestre = models.IntegerField(default=1)
     def __str__(self):
         return f"{self.id} ({self.id_programas.nombre}, {self.id_asignatura.nombre})"
     

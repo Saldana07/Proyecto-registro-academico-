@@ -98,7 +98,7 @@
                        
                       
                         {% if perms.auth.view_group %}
-                        <a class="collapse-item" href="">MODIFICAR</a>
+                        <a class="collapse-item" href="{% url 'lista' %}">MODIFICAR</a>
                         {% endif %}
                         {% if perms.auth.change_group %}
                         <a class="collapse-item" href="{%url 'Proyeccion'%}">DILIGENCIAR</a>

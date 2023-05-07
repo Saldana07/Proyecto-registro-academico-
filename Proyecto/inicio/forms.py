@@ -72,20 +72,16 @@ class EditUserForm(forms.ModelForm):
 class ProyeccionForm(forms.ModelForm):
     class Meta:
         model = Proyeccion
-        fields = ('id_programas', 'id_asignatura',)
+        fields = ('id_programas', 'id_asignatura','semestre')
         widgets = {
+            
             'id_programas': forms.Select(attrs={'class': 'form-control'}),
             'id_asignatura': forms.Select(attrs={'class': 'form-control'}),
+            'semestre': forms.NumberInput(attrs={'class': 'form-control'}),
         }
         
         
-class ProyeccionEditForm(forms.ModelForm):
+class ProyeccionForm1(forms.ModelForm):
     class Meta:
         model = Proyeccion
-        fields = ('id_programas', 'id_asignatura', 'total_semana', 'num_profesores')
-        widgets = {
-            'id_programas': forms.Select(attrs={'class': 'form-control'}),
-            'id_asignatura': forms.Select(attrs={'class': 'form-control'}),
-            'total_semana': forms.NumberInput(attrs={'class': 'form-control'}),
-            'num_profesores': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
+        fields = ('id_programas', 'id_asignatura')

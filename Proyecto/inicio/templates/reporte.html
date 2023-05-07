@@ -52,6 +52,7 @@
                                     <thead>
                                         <tr>
                                             <th>Semestre</th>
+                                            <th>Jornada</th>
                                             <th>Código</th>
                                             <th>Asignatura</th>
                                             <th>Créditos</th>
@@ -65,6 +66,7 @@
                                         {% for dato in datos %}
                                         <tr>
                                             <td>{{ dato.semestre }}</td>
+                                            <td>{{ dato.jornada }}</td>
                                             <td>{{ dato.codigo }}</td>
                                             <td>{{ dato.asignatura }}</td>
                                             <td>{{ dato.creditos }}</td>
@@ -76,6 +78,7 @@
                                         {% endfor %}
                                         <tr>
                                             <th>Totales</th>
+                                            <th></th>
                                             <th></th>
                                             <th></th>
                                             <th></th>

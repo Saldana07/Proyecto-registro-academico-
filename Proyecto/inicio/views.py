@@ -8,9 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.contrib import auth
-from .forms import LoginForm, registro_form,EditUserForm,ProyeccionForm,ProyeccionEditForm
+from .forms import LoginForm, registro_form,EditUserForm,ProyeccionForm
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import Group
 from django.shortcuts import render, get_object_or_404
 from .models import Proyeccion,Asignatura,Programas,Mensaje
 from django.contrib.auth.models import Group, Permission
@@ -109,7 +108,7 @@ def desactivar_usuario(request, email):
     usuario.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-from django.contrib.auth.models import Group
+
 def activarusuarios_view(request):
     usuarios= User.objects.all()
     user= User.objects.all().prefetch_related('grups')
@@ -178,7 +177,8 @@ def get_datos():
     datos = []
 
     for proyeccion in proyecciones:
-        semestre = proyeccion.id_programas.jornada
+        semestre = proyeccion.semestre
+        jornada = proyeccion.id_programas.jornada
         codigo = proyeccion.id_asignatura.codigo
         asignatura = proyeccion.id_asignatura.nombre
         creditos = proyeccion.id_asignatura.creditos
@@ -189,6 +189,7 @@ def get_datos():
 
         datos.append({
             'semestre': semestre,
+            'jornada': jornada,
             'codigo': codigo,
             'asignatura': asignatura,
             'creditos': creditos,
@@ -206,7 +207,9 @@ def proyeccion_view(request):
         if form.is_valid():
             id_programas = form.cleaned_data['id_programas']
             id_asignatura = form.cleaned_data['id_asignatura']
-            proyeccion = Proyeccion.objects.create(id_programas=id_programas, id_asignatura=id_asignatura)
+            semestre = form.cleaned_data['semestre']
+            
+            proyeccion = Proyeccion.objects.create(id_programas=id_programas, id_asignatura=id_asignatura,semestre=semestre)
             return redirect('/inicio/proyeccion')
     else:
         form = ProyeccionForm()
@@ -229,25 +232,27 @@ def descargar_tabla(request):
 
     # Agregar encabezados a la hoja de cálculo
     sheet['A1'] = 'Semestre'
-    sheet['B1'] = 'Código'
-    sheet['C1'] = 'Asignatura'
-    sheet['D1'] = 'Créditos'
-    sheet['E1'] = 'Intensidad'
-    sheet['F1'] = 'Total Semana'
-    sheet['G1'] = 'N° Profesores'
-    sheet['H1'] = 'Total a Pagar'
+    sheet['B1'] = 'Jornada'
+    sheet['C1'] = 'Código'
+    sheet['D1'] = 'Asignatura'
+    sheet['E1'] = 'Créditos'
+    sheet['F1'] = 'Intensidad'
+    sheet['G1'] = 'Total Semana'
+    sheet['H1'] = 'N° Profesores'
+    sheet['I1'] = 'Total a Pagar'
 
     # Agregar datos a la hoja de cálculo
     row = 2
     for dato in datos:
         sheet.cell(row=row, column=1).value = dato['semestre']
-        sheet.cell(row=row, column=2).value = dato['codigo']
-        sheet.cell(row=row, column=3).value = dato['asignatura']
-        sheet.cell(row=row, column=4).value = dato['creditos']
-        sheet.cell(row=row, column=5).value = dato['intensidad']
-        sheet.cell(row=row, column=6).value = dato['total_semana']
-        sheet.cell(row=row, column=7).value = dato['num_profesores']
-        sheet.cell(row=row, column=8).value = dato['total_a_pagar']
+        sheet.cell(row=row, column=2).value = dato['jornada']
+        sheet.cell(row=row, column=3).value = dato['codigo']
+        sheet.cell(row=row, column=4).value = dato['asignatura']
+        sheet.cell(row=row, column=5).value = dato['creditos']
+        sheet.cell(row=row, column=6).value = dato['intensidad']
+        sheet.cell(row=row, column=7).value = dato['total_semana']
+        sheet.cell(row=row, column=8).value = dato['num_profesores']
+        sheet.cell(row=row, column=9).value = dato['total_a_pagar']
         row += 1
 
     workbook.save(response)
@@ -279,7 +284,8 @@ def reporte_view(request):
     total_pago = 0
 
     for proyeccion in proyecciones:
-        semestre = proyeccion.id_programas.jornada
+        semestre = proyeccion.semestre
+        jornada = proyeccion.id_programas.jornada
         codigo = proyeccion.id_asignatura.codigo
         asignatura = proyeccion.id_asignatura.nombre
         creditos = proyeccion.id_asignatura.creditos
@@ -288,7 +294,8 @@ def reporte_view(request):
         num_profesores = proyeccion.num_profesores
 
         datos.append({
-            'semestre': semestre,
+            'semestre':semestre,
+            'jornada': jornada,
             'codigo': codigo,
             'asignatura': asignatura,
             'creditos': creditos,
@@ -316,16 +323,21 @@ def reporte_view(request):
 
 
 
-def proyeccion_edit(request, id):
+
+
+def proyeccion_list(request):
+    proyecciones = Proyeccion.objects.all()
+    return render(request, 'editarProyeccion.html', {'proyecciones': proyecciones})
+
+
+def editar_proyeccion(request, id):
     proyeccion = get_object_or_404(Proyeccion, id=id)
     if request.method == 'POST':
         form = ProyeccionForm(request.POST, instance=proyeccion)
         if form.is_valid():
             form.save()
-            return redirect('/inicio/reporte')
+            return redirect('/inicio/editar')
     else:
         form = ProyeccionForm(instance=proyeccion)
-    context = {'form': form}
-    return render(request, 'editarProyeccion.html', context)
 
-    
+    return render(request, 'editarProyeccion.html', {'form': form})
