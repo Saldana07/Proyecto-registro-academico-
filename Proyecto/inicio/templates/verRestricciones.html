@@ -44,29 +44,24 @@
                               <h6 class="m-0 font-weight-bold text-danger">PROYECCIONES</h6>
                           </div>
                           {% if restricciones %}
-                          <h1>Programaciones restringidas</h1>
-                          <p>Restringido para el grupo: {{ grupo.name }}</p>
-                          <p>Fecha de inicio: {{ fecha_inicio }}</p>
-                          <p>Fecha de fin: {{ fecha_fin }}</p>
+                  
                           <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                  <thead>
+                                   <thead>
                                     <tr>
-                                      <th>Grupo</th>
-                                      <th>Fecha de inicio</th>
-                                      <th>Fecha de fin</th>
+                                        <th>Fecha de inicio</th>
+                                        <th>Fecha de fin</th>
                                     </tr>
-                                  </thead>
-                                  <tbody>
-                                    {% for programacion in restricciones %}
-                                      <tr>
-                                        <td>{{ programacion.grupo.name }}</td>
-                                        <td>{{ programacion.fecha_inicio }}</td>
-                                        <td>{{ programacion.fecha_fin }}</td>
-                                      </tr>
+                                </thead>
+                                <tbody>
+                                    {% for restriccion in restricciones %}
+                                    <tr>
+                                        <td>{{ restriccion.fecha_inicio }}</td>
+                                        <td>{{ restriccion.fecha_fin }}</td>
+                                    </tr>
                                     {% endfor %}
-                                  </tbody>
+                                </tbody>
                                     {% else %}
                                       <tr>
                                         <td colspan="3">No hay restricciones de fechas activas.</td>
@@ -78,8 +73,8 @@
                                 
                             </div>
                             <div class="text-right">
-                                    
-                              <a class="btn btn-danger" href="{% url 'quitar_restricciones' %}">Quitar restricciones</a>
+                                <a class="btn btn-danger" href="{% url 'seleccionar_fechas' %}">HACER RESTRINCCION</a>    
+                            
                           </div>
                       
                   </div>

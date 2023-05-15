@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 
-from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Programacion
+from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Programacion,Restriccion
 
 #from django.contrib.auth.models import User, Group
 
@@ -47,3 +47,7 @@ class ProgramacionAdmin(admin.ModelAdmin):
     list_display = ('id_proyeccion', 'dia', 'hora')
 
 admin.site.register(Programacion, ProgramacionAdmin)
+
+class RestriccionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fecha_inicio', 'fecha_fin')
+admin.site.register(Restriccion, RestriccionAdmin)

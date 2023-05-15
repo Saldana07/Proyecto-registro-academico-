@@ -21,14 +21,19 @@
       {% endfor %}
     </select>
   </div>
+  <div class="text-right">
   <button type="submit" class="btn btn-primary">Restringir fechas</button>
-  <button type="submit" class="btn btn-danger" name="cancelar_restriccion">Cancelar restricción</button>
+</div>
+  <!--<button type="submit" class="btn btn-danger" name="cancelar_restriccion">Cancelar restricción</button>-->
  
 
 </form>
 <br>
-<a class="btn btn-danger" href="{% url 'ver_restricciones_fechas' %}">VER DISPONIBILIDAD</a>
 
+<div class="text-right">
+  <a class="btn btn-danger" href="{% url 'ver_restricciones_fechas' %}">VER DISPONIBILIDAD</a>                            
+
+</div>
 
 
 {% endblock %}

@@ -26,10 +26,9 @@ urlpatterns = [
     path('tablaDisponibilidad', views.disponibilidad, name='disponibilidad'),
     path('programacion', views.crear_programacion, name='programacion_nuevo'),
     path('verProgramacion', views.ver_programacion, name='ver_programacion'),
-    path('restringir-fechas', views.restringir_fechas, name='restringir_fechas'),
-    path('ver-restricciones-fechas', views.ver_restricciones_fechas, name='ver_restricciones_fechas'),
-    path('quitar-restricciones', views.quitar_restricciones, name='quitar_restricciones'),
-
+    path('ver-restricciones-fechas', views.ver_restricciones, name='ver_restricciones_fechas'),
+    path('seleccionar-fechas', views.restringir, name='seleccionar_fechas'),
+    
 
   
     

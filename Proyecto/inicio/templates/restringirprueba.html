@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2>Restringir Disponibilidad</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="fecha_inicio">Fecha de inicio:</label>
+        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+      </div>
+      <div class="form-group">
+        <label for="fecha_fin">Fecha de fin:</label>
+        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+      </div>
+      <div class="text-right">
+        <a class="btn btn-danger" href="{% url 'ver_restricciones_fechas' %}">VER RESTRINCCIONES</a>    
+        <button type="submit" class="btn btn-danger mr-2">RESTRINGIR</button>
+    </div>
+     
+    </form>
+    
+       
+ 
+   
+  </div>
+{% endblock %}

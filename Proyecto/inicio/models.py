@@ -94,3 +94,9 @@ class Programacion(models.Model):
 
     def __str__(self):
         return f"{self.id_proyeccion.id} ({self.hora}, {self.get_dia_display()})"
+    
+    
+    
+class Restriccion(models.Model):
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
