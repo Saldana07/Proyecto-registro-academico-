@@ -44,3 +44,53 @@ class Mensaje(models.Model):
     contenido = models.TextField()
     archivo_adjunto = models.FileField(upload_to='archivos_adjuntos/', blank=True, null=True)
     fecha_envio = models.DateTimeField(auto_now_add=True)
+    
+"""
+class Disponibilidad(models.Model):
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    comentarios = models.TextField()
+    profesor = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.profesor.username} - {self.fecha} ({self.hora_inicio}-{self.hora_fin})"
+"""
+class Disponibilidad(models.Model):
+    DAY_CHOICES = [
+        ('L', 'Lunes'),
+        ('M', 'Martes'),
+        ('X', 'Miércoles'),
+        ('J', 'Jueves'),
+        ('V', 'Viernes'),
+        ('S', 'Sábado'),
+        ('D', 'Domingo'),
+    ]
+    fecha = models.CharField(choices=DAY_CHOICES, max_length=1)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    comentarios = models.TextField(default="Disponible", null=True)
+    profesor = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.profesor.username} - {self.get_fecha_display()} ({self.hora_inicio}-{self.hora_fin})"
+
+from django.contrib.auth.models import Group
+
+class Programacion(models.Model):
+    DAY_CHOICES1 = [
+        ('LUNES', 'Lunes'),
+        ('MARTES', 'Martes'),
+        ('MIERCOLES', 'Miércoles'),
+        ('JUEVES', 'Jueves'),
+        ('VIERNES', 'Viernes'),
+        ('SABADO', 'Sábado'),
+        ('DOMINGO', 'Domingo'),
+    ]
+    id = models.AutoField(primary_key=True)
+    id_proyeccion = models.ForeignKey(Proyeccion, on_delete=models.CASCADE)
+    hora = models.TimeField()
+    dia = models.CharField(choices=DAY_CHOICES1, max_length=15)
+
+    def __str__(self):
+        return f"{self.id_proyeccion.id} ({self.hora}, {self.get_dia_display()})"

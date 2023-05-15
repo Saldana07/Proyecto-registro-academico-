@@ -21,7 +21,16 @@ urlpatterns = [
     path('export/proyeccion/excel/', views.descargar_tabla, name='descargar_tabla'),
     path('reporte', views.reporte_view, name='Reporte'),
     path('editar', views.proyeccion_list, name='lista'),
-    path('proyecciones/<int:id>/editar/', views.editar_proyeccion, name='editar_proyeccion')
+    path('proyecciones/<int:id>/editar/', views.editar_proyeccion, name='editar_proyeccion'),
+    path('disponibilidad', views.vista_para_profesor, name='registrar_disponibilidad'),
+    path('tablaDisponibilidad', views.disponibilidad, name='disponibilidad'),
+    path('programacion', views.crear_programacion, name='programacion_nuevo'),
+    path('verProgramacion', views.ver_programacion, name='ver_programacion'),
+    path('restringir-fechas', views.restringir_fechas, name='restringir_fechas'),
+    path('ver-restricciones-fechas', views.ver_restricciones_fechas, name='ver_restricciones_fechas'),
+    path('quitar-restricciones', views.quitar_restricciones, name='quitar_restricciones'),
+
+
   
     
     

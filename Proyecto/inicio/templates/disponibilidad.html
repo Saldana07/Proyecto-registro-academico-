@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h1 class="m-0 font-weight-bold text-danger">Disponibilidad</h1>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_fecha">Fecha:</label>
+          {{ form.fecha }}
+      </div>
+        <div class="form-group">
+          <label for="id_hora_inicio">Hora de inicio:</label>
+          <input type="time" name="hora_inicio" id="id_hora_inicio" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="id_hora_fin">Hora de fin:</label>
+          <input type="time" name="hora_fin" id="id_hora_fin" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="id_comentarios">Comentarios:</label>
+          <textarea name="comentarios" id="id_comentarios" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger">Guardar</button>
+      </form>
+      <div class="text-right">
+        <a class="text-danger" href="{% url 'disponibilidad' %}">VER DISPONIBILIDAD</a>
+    </div>
+    </div>
+      </div>
+      
+
+      
+    </div>
+
+
+    {% endblock %}
