@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from .models import Disponibilidad, Programas, Asignatura, Proyeccion,Programacion
+from .models import Disponibilidad, Programas, Asignatura, Proyeccion
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
@@ -108,9 +108,23 @@ class DisponibilidadForm(forms.Form):
         ('DOMINGO', 'Domingo'),
     ]
     
-    fecha = forms.ChoiceField(choices= DAY_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
-    hora_inicio = forms.TimeField(widget=forms.TextInput(attrs={'type': 'time', 'class': 'form-control'}))
-    hora_fin = forms.TimeField(widget=forms.TextInput(attrs={'type': 'time', 'class': 'form-control'}))
+    fecha = forms.ChoiceField(choices=DAY_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    HORA_INICIO=[
+        ('07:00', '07:00 AM'),
+        ('10:00', '10:00 AM'),
+        ('14:00', '02:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+    ]
+    hora_inicio = forms.ChoiceField(choices=HORA_INICIO, widget=forms.Select(attrs={'class': 'form-control'}))
+    HORA_FIN=[
+        ('10:00', '10:00 AM'),
+        ('13:00', '01:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+        ('21:30', '09:30 PM'),
+    ]
+    hora_fin = forms.ChoiceField(choices=HORA_FIN, widget=forms.Select(attrs={'class': 'form-control'}))
     comentarios = forms.CharField(initial='Disponible', widget=forms.Textarea(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
@@ -118,9 +132,7 @@ class DisponibilidadForm(forms.Form):
         self.fields['comentarios'].required = False
 
 
-
-
-class ProgramacionForm(forms.ModelForm):
+class EditDisponibilidadForm(forms.ModelForm):
     DAY_CHOICES = [
         ('LUNES', 'Lunes'),
         ('MARTES', 'Martes'),
@@ -131,25 +143,28 @@ class ProgramacionForm(forms.ModelForm):
         ('DOMINGO', 'Domingo'),
     ]
     
-    proyeccion = forms.ModelChoiceField(queryset=Proyeccion.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    dia = forms.ChoiceField(choices=DAY_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
-    hora = forms.TimeField(widget=forms.TextInput(attrs={'type': 'time', 'class': 'form-control'}))
-
-    def clean_dia(self):
-        return self.cleaned_data['dia'].upper()
-
-    def save(self, commit=True):
-        programacion = super(ProgramacionForm, self).save(commit=False)
-        programacion.id_proyeccion_id = self.cleaned_data['proyeccion'].id
-        if commit:
-            programacion.save()
-        return programacion
+    fecha = forms.ChoiceField(choices=DAY_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    hora_inicio = forms.ChoiceField(choices=[
+        ('07:00', '07:00 AM'),
+        ('10:00', '10:00 AM'),
+        ('14:00', '02:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+    ], widget=forms.Select(attrs={'class': 'form-control'}))
+    hora_fin = forms.ChoiceField(choices=[
+        ('10:00', '10:00 AM'),
+        ('13:00', '01:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+        ('21:30', '09:30 PM'),
+    ], widget=forms.Select(attrs={'class': 'form-control'}))
+    comentarios = forms.CharField(initial='Disponible', widget=forms.Textarea(attrs={'class': 'form-control'}))
 
     class Meta:
-        model = Programacion
-        fields = ['proyeccion', 'dia', 'hora']
-        
-        
+        model = Disponibilidad
+        fields = ['fecha', 'hora_inicio', 'hora_fin', 'comentarios']
+
+
         
 
 from django import forms

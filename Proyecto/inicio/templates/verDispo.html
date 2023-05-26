@@ -47,24 +47,30 @@
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
-                                        <tr>
-                                            <th><a href="?ordenar_por=fecha">Fecha</a></th>
-                                            <th><a href="?ordenar_por=hora_inicio">Hora de inicio</a></th>
-                                            <th><a href="?ordenar_por=hora_fin">Hora de fin</a></th>
-                                            <th><a href="?ordenar_por=comentarios">Comentarios</a></th>
-                                        </tr>
+                                      <tr>
+                                        <th><a href="?ordenar_por=fecha">Fecha</a></th>
+                                        <th><a href="?ordenar_por=hora_inicio">Hora de inicio</a></th>
+                                        <th><a href="?ordenar_por=hora_fin">Hora de fin</a></th>
+                                        <th><a href="?ordenar_por=comentarios">Comentarios</a></th>
+                                        
+                                      </tr>
                                     </thead>
                                     <tbody>
                                         {% for d in disponibilidad %}
-                                        <tr>
-                                            <td>{{ d.fecha }}</td>
-                                            <td>{{ d.hora_inicio|time }}</td>
-                                            <td>{{ d.hora_fin|time }}</td>
-                                            <td>{{ d.comentarios }}</td>
-                                        </tr>
-                                        {% endfor %}
+                                        {% if d.profesor.username == user.username %} 
+                                        {% if d.mostrar_en_tabla %}
+                                            <tr>
+                                                <td>{{ d.fecha }}</td>
+                                                <td>{{ d.hora_inicio }}</td>
+                                                <td>{{ d.hora_fin }}</td>
+                                                <td>{{ d.comentarios }}</td>
+                                            </tr>
+                                        {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
                                     </tbody>
-                                </table>
+                                  </table>
+                                  
                                 <div class="text-right">
                                     
                                     <a class="btn btn-danger" href="{% url 'registrar_disponibilidad' %}">HACER DISPONIBILIDAD</a>

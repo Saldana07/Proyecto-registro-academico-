@@ -24,11 +24,16 @@ urlpatterns = [
     path('proyecciones/<int:id>/editar/', views.editar_proyeccion, name='editar_proyeccion'),
     path('disponibilidad', views.vista_para_profesor, name='registrar_disponibilidad'),
     path('tablaDisponibilidad', views.disponibilidad, name='disponibilidad'),
-    path('programacion', views.crear_programacion, name='programacion_nuevo'),
-    path('verProgramacion', views.ver_programacion, name='ver_programacion'),
     path('ver-restricciones-fechas', views.ver_restricciones, name='ver_restricciones_fechas'),
     path('seleccionar-fechas', views.restringir, name='seleccionar_fechas'),
-    
+    path('cargar_tabla', views.cargar_tabla, name='cargar_tabla'),
+    path('disponibilidad/<int:disponibilidad_id>>/editar/', views.editar_disponibilidad, name='editar_disponibilidad'),
+    path('editarDisponibilidad', views.vereditdisponibilidad, name='editarDisponibilidad'),
+    path('activar_disponibilidad/<int:disponibilidad_id>/', views.activar_disponibilidad, name='activar_disponibilidad'),
+    path('desactivar_disponibilidad/<int:disponibilidad_id>/', views.desactivar_disponibilidad, name='desactivar_disponibilidad'),
+    path('verprogramacion', views.mostrar_programacion, name='mostrar_programacion'),
+    path('mostrar_cronograma', views.mostrar_cronograma, name='mostrar_cronograma'),
+
 
   
     

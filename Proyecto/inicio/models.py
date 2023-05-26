@@ -8,9 +8,9 @@ from django.contrib.auth.models import User
 
 class Programas(models.Model):
     codigo = models.AutoField(primary_key=True)
+    cod = models.CharField(max_length=200)
     nombre = models.CharField(max_length=200)
     correo = models.CharField(max_length=200)
-    id_usuarios = models.ForeignKey(User, on_delete=models.CASCADE)
     jornada = models.CharField(max_length=200)
     def __str__(self):
         return self.nombre
@@ -58,27 +58,6 @@ class Disponibilidad(models.Model):
 """
 class Disponibilidad(models.Model):
     DAY_CHOICES = [
-        ('L', 'Lunes'),
-        ('M', 'Martes'),
-        ('X', 'Miércoles'),
-        ('J', 'Jueves'),
-        ('V', 'Viernes'),
-        ('S', 'Sábado'),
-        ('D', 'Domingo'),
-    ]
-    fecha = models.CharField(choices=DAY_CHOICES, max_length=1)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    comentarios = models.TextField(default="Disponible", null=True)
-    profesor = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.profesor.username} - {self.get_fecha_display()} ({self.hora_inicio}-{self.hora_fin})"
-
-from django.contrib.auth.models import Group
-
-class Programacion(models.Model):
-    DAY_CHOICES1 = [
         ('LUNES', 'Lunes'),
         ('MARTES', 'Martes'),
         ('MIERCOLES', 'Miércoles'),
@@ -87,16 +66,51 @@ class Programacion(models.Model):
         ('SABADO', 'Sábado'),
         ('DOMINGO', 'Domingo'),
     ]
-    id = models.AutoField(primary_key=True)
-    id_proyeccion = models.ForeignKey(Proyeccion, on_delete=models.CASCADE)
-    hora = models.TimeField()
-    dia = models.CharField(choices=DAY_CHOICES1, max_length=15)
+    fecha = models.CharField(choices=DAY_CHOICES, max_length=15)
+    hora_inicio = models.CharField(choices=[
+        ('07:00', '07:00 AM'),
+        ('10:00', '10:00 AM'),
+        ('14:00', '02:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+    ], max_length=5)
+    hora_fin = models.CharField(choices=[
+        ('10:00', '10:00 AM'),
+        ('13:00', '01:00 PM'),
+        ('17:00', '05:00 PM'),
+        ('18:30', '06:30 PM'),
+        ('21:30', '09:30 PM'),
+    ], max_length=5)
+    comentarios = models.TextField(default="Disponible", null=True)
+    profesor = models.ForeignKey(User, on_delete=models.CASCADE)
+    mostrar_en_tabla = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.id_proyeccion.id} ({self.hora}, {self.get_dia_display()})"
+        return f"{self.profesor.username} - {self.get_fecha_display()} ({self.hora_inicio} - {self.hora_fin})"
+
+
+
+
     
     
     
 class Restriccion(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
+
+
+
+class Programacion(models.Model):
+    id = models.AutoField(primary_key=True)
+    programa_jornada = models.CharField(max_length=100)
+    codigo_asignatura = models.CharField(max_length=20)
+    grupo = models.CharField(max_length=10)
+    codigo_grupo = models.CharField(max_length=20)
+    cupo = models.IntegerField()
+    cupo_generico = models.IntegerField()
+    id_usuarios = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    
+    def __str__(self):
+        return f"{self.codigo_asignatura} - {self.grupo}"
+    

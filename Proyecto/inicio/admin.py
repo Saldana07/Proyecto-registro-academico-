@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 
-from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Programacion,Restriccion
+from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Restriccion,Programacion
 
 #from django.contrib.auth.models import User, Group
 
@@ -15,7 +15,7 @@ class AsignaturaAdmin(admin.ModelAdmin):
 admin.site.register(Asignatura, AsignaturaAdmin)
 
 class ProgramasAdmin(admin.ModelAdmin):
-    list_display = ('codigo', 'nombre', 'correo', 'id_usuarios', 'jornada')
+    list_display = ('codigo','cod', 'nombre', 'correo', 'jornada')
 
 
 admin.site.register(Programas, ProgramasAdmin)
@@ -37,17 +37,19 @@ admin.site.register(Proyeccion, ProyeccionAdmin)
 admin.site.register(Mensaje)
 
 class DisponibilidadAdmin(admin.ModelAdmin):
-    list_display = ('profesor', 'fecha', 'hora_inicio', 'hora_fin')
+    list_display = ('profesor', 'fecha', 'hora_inicio', 'hora_fin', 'mostrar_en_tabla' )
 
 admin.site.register(Disponibilidad, DisponibilidadAdmin)
 
 
 
-class ProgramacionAdmin(admin.ModelAdmin):
-    list_display = ('id_proyeccion', 'dia', 'hora')
 
-admin.site.register(Programacion, ProgramacionAdmin)
 
 class RestriccionAdmin(admin.ModelAdmin):
     list_display = ('id', 'fecha_inicio', 'fecha_fin')
 admin.site.register(Restriccion, RestriccionAdmin)
+
+
+class ProgramacionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'programa_jornada', 'codigo_asignatura', 'grupo', 'codigo_grupo', 'cupo', 'cupo_generico','id_usuarios')
+admin.site.register(Programacion,ProgramacionAdmin)

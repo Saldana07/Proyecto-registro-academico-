@@ -10,11 +10,13 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.contrib import auth
-from .forms import DisponibilidadForm, LoginForm, registro_form,EditUserForm,ProyeccionForm,ProgramacionForm,RestringirFechasForm
+from .forms import DisponibilidadForm, LoginForm, registro_form,EditUserForm,ProyeccionForm,RestringirFechasForm,EditDisponibilidadForm
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, get_object_or_404
-from .models import Disponibilidad, Proyeccion,Asignatura,Programacion,Mensaje,Restriccion
+from .models import Disponibilidad, Proyeccion,Asignatura,Mensaje,Restriccion,Programacion
 from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 
 # Create your views here.
 def inicio_view(request):
@@ -324,9 +326,6 @@ def reporte_view(request):
 
 
 
-
-
-
 def proyeccion_list(request):
     proyecciones = Proyeccion.objects.all()
     return render(request, 'editarProyeccion.html', {'proyecciones': proyecciones})
@@ -358,47 +357,6 @@ def disponibilidad(request):
     return render(request, 'verDispo.html', context)
 
 
-def ver_programacion(request):
-    programaciones = Programacion.objects.all()
-    proyecciones = Proyeccion.objects.all()
-    return render(request, 'verProgramacion.html', {'programaciones': programaciones, 'proyecciones': proyecciones})
-
-
-
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.utils import timezone
-from datetime import datetime
-
-from django.utils import timezone
-
-from django.db.models import Q
-def crear_programacion(request):
-    if request.method == 'POST':
-        form = ProgramacionForm(request.POST)
-        if form.is_valid():
-            programacion = form.save(commit=False)
-            # Verificar si el usuario pertenece a uno de los grupos restringidos
-            if request.user.groups.filter(name__in=request.session.get('grupos', [])).exists():
-                # Obtener las fechas de inicio y fin de restricción
-                fecha_inicio = timezone.datetime.strptime(request.POST.get('fecha_inicio'), '%Y-%m-%d')
-                fecha_fin = timezone.datetime.strptime(request.POST.get('fecha_fin'), '%Y-%m-%d')
-                # Verificar si la fecha de programación está dentro del rango de restricción
-                if fecha_inicio <= programacion.id_proyeccion.fecha <= fecha_fin:
-                    programacion.save()
-                    messages.success(request, 'La programación se ha creado correctamente.')
-                    return redirect('/inicio/programacion', pk=programacion.pk)
-                else:
-                    messages.error(request, 'La fecha de programación no está dentro del rango permitido.')
-            else:
-                # Si el usuario no tiene el rol de secretaría académica ni pertenece a uno de los grupos restringidos, mostrar un mensaje de error
-                messages.error(request, 'No tienes permisos para crear programaciones en este rango de fechas.')
-    else:
-        form = ProgramacionForm()
-    return render(request, 'programacion.html', {'form': form})
-
-
 
 
 
@@ -423,7 +381,9 @@ def restringir(request):
     
     return render(request, 'restringirprueba.html', {'fecha_actual': fecha_actual})
 
+
 import datetime
+
 def vista_para_profesor(request):
     fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d')
     form = DisponibilidadForm(request.POST or None)
@@ -439,17 +399,15 @@ def vista_para_profesor(request):
         restricciones = Restriccion.objects.all()
         for restriccion in restricciones:
             if restriccion.fecha_inicio <= datetime.datetime.strptime(fecha_actual, '%Y-%m-%d').date() <= restriccion.fecha_fin:
-    
                 messages.error(request, f"No puedes hacer disponibilidad en este día porque ha sido restringido entre las {restriccion.fecha_inicio} y las {restriccion.fecha_fin}.")
-               
-            return redirect('/inicio/disponibilidad')
-        fecha = form.cleaned_data['fecha']
+                return redirect('/inicio/disponibilidad')
+        
         # verificar si ya hay disponibilidad en el mismo horario
         disponibilidades = Disponibilidad.objects.filter(
             profesor=profesor,
             fecha=fecha,
-            hora_inicio__lte=hora_fin,
-            hora_fin__gte=hora_inicio
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin
         )
         if disponibilidades.exists():
             messages.error(request, 'Ya tienes una disponibilidad registrada para este horario.')
@@ -469,6 +427,44 @@ def vista_para_profesor(request):
 
     return render(request, 'disponibilidad.html', {'fecha_actual': fecha_actual, 'form': form})
 
+
+
+def vereditdisponibilidad(request):
+    ordenar_por = request.GET.get('ordenar_por', 'fecha') # por defecto, ordenar por fecha
+    disponibilidad = Disponibilidad.objects.order_by(ordenar_por)
+    context = {
+        'disponibilidad': disponibilidad,
+        'ordenar_por': ordenar_por,
+    }
+    return render(request, 'editardisponibilidad.html', context)
+
+def activar_disponibilidad(request, disponibilidad_id):
+    disponibilidad = get_object_or_404(Disponibilidad, id=disponibilidad_id)
+    disponibilidad.mostrar_en_tabla = True 
+    disponibilidad.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+def desactivar_disponibilidad(request, disponibilidad_id):
+    disponibilidad = get_object_or_404(Disponibilidad, id=disponibilidad_id)
+    disponibilidad.mostrar_en_tabla = False
+    disponibilidad.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def editar_disponibilidad(request, disponibilidad_id):
+    disponibilidad = get_object_or_404(Disponibilidad, id=disponibilidad_id)
+
+    if request.method == 'POST':
+        form = EditDisponibilidadForm(request.POST, instance=disponibilidad)
+        if form.is_valid():
+            form.save()
+            return redirect('/inicio/editarDisponibilidad')
+    else:
+        form = EditDisponibilidadForm(instance=disponibilidad)
+
+    return render(request, 'editarDisponibilidad.html', {'form': form})
+ 
+
 def ver_restricciones(request):
     restricciones = Restriccion.objects.all()
     return render(request, 'verRestricciones.html', {'restricciones': restricciones})
@@ -485,3 +481,202 @@ def eliminar_restriccion(request, restriccion_id):
         return redirect('inicio/verRestricciones')
 
     return render(request, 'verRestricciones.html', {'restriccion': restriccion})
+
+
+from django.contrib.auth.models import User
+from django.db.models import Q
+def cargar_tabla(request):
+    if request.method == 'POST':
+        archivo = request.FILES['archivo_excel']
+        workbook = openpyxl.load_workbook(archivo)  # Cargar el archivo Excel con openpyxl
+        
+        # Obtener los datos de las columnas y guardarlos en las tablas correspondientes
+        datos_tabla1 = []
+        
+        sheet = workbook['programación']  # Reemplaza 'NombreHoja' con el nombre de la hoja en tu archivo Excel
+        
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            programa = row[0]
+            prog_jornada = row[1]
+            tipo_asignatura = row[2]
+            semestre = row[3]
+            codigo_asig = row[4]
+            nombre_asig = row[5]
+            creditos = row[6]
+            grupo = row[7]
+            codigo_grupo = row[8]
+            cupo = row[9]
+            cupo_generico = row[10]
+            ajuste_cupos = row[11]
+            cc = row[12]
+            nombre_docente = row[13]
+            correo_electronico = row[14]
+            dia = row[15]
+            horario = row[16]
+            intensidad_semanal = row[17]
+            clase_requiere_sala = row[18]
+            salon = row[19]
+            observaciones = row[20]
+            banco_datos_docentes = row[21]
+            salones = row[22]
+            capacidad_espacios = row[23]
+            print("Datos de la fila:")
+            print("Programa:", programa)
+            print("Programa jornada:", prog_jornada)
+            print("Tipo de asignatura:", tipo_asignatura)
+            print("Semestre:", semestre)
+            print("Código de asignatura:", codigo_asig)
+            print("Nombre de asignatura:", nombre_asig)
+            print("Créditos:", creditos)
+            print("Grupo:", grupo)
+            print("Código de grupo:", codigo_grupo)
+            print("Cupo:", cupo)
+            print("Cupo genérico:", cupo_generico)
+            print("Ajuste de cupos:", ajuste_cupos)
+            print("CC:", cc)
+            print("Nombre de docente:", nombre_docente)
+            print("Correo electrónico:", correo_electronico)
+            print("Día:", dia)
+            print("Horario:", horario)
+            print("Intensidad semanal:", intensidad_semanal)
+            print("Clase requiere sala:", clase_requiere_sala)
+            print("Salón:", salon)
+            print("Observaciones:", observaciones)
+            print("Banco de datos docentes:", banco_datos_docentes)
+            print("Salones:", salones)
+            print("Capacidad de espacios:", capacidad_espacios)
+            
+
+            cc = str(cc)
+            nombres = nombre_docente.split()  # Separar los nombres por espacios
+            primer_apellidos = nombres[0]  # Obtener el primer nombre
+            segundo_apellidos = nombres[1]  # Obtener el segundo nombre
+            nombres = nombres[2:]  # Obtener los apellidos como una lista
+
+            # Crear usuarios y guardarlos en la tabla User
+            user, created = User.objects.get_or_create(username=cc, email=correo_electronico)
+            user.first_name = ' '.join(nombres)
+            user.last_name = f"{ primer_apellidos} {segundo_apellidos}"  # Convertir la lista de apellidos en una cadena separada por espacios
+            user.set_password(cc)
+            user.save()
+            grupo_profesor, created = Group.objects.get_or_create(name='Profesores')  
+            user.groups.add(grupo_profesor)
+           
+            try:
+                # Verificar si la asignatura ya existe
+                asignatura = Asignatura.objects.get(codigo=codigo_asig)
+            except Asignatura.DoesNotExist:
+                    # La asignatura no existe, crear una nueva
+                    asignatura = Asignatura(
+                        codigo=codigo_asig,
+                        nombre=nombre_asig,
+                        creditos=creditos,
+                        intensidad=creditos * 2
+                    )
+            asignatura.save()
+            
+            programacion = Programacion.objects.filter(
+                Q(programa_jornada=prog_jornada) &
+                Q(codigo_asignatura=codigo_asig) &
+                Q(grupo=grupo) &
+                Q(codigo_grupo=codigo_grupo) &
+                Q(cupo=cupo) &
+                Q(cupo_generico=cupo_generico) &
+                Q(id_usuarios=user)
+            ).exists()
+            if programacion:
+        # La programación ya existe, realiza la acción necesaria
+        
+                print("Error: La programación ya existe.")
+            else:
+             programacion = Programacion(
+                    programa_jornada=prog_jornada,
+                    codigo_asignatura=codigo_asig,
+                    grupo=grupo,
+                    codigo_grupo=codigo_grupo,
+                    cupo=cupo,
+                    cupo_generico=cupo_generico,
+                    id_usuarios=user
+                    
+                )
+             programacion.save()
+                
+        
+        return render(request, 'cargarTabla.html')
+    
+    return render(request, 'cargarTabla.html')
+
+
+
+def mostrar_programacion(request):
+    programacion = Programacion.objects.all()
+    return render(request, 'programacion.html', {'programacion': programacion})
+
+
+
+from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from .models import Programacion
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from .models import Programacion
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from .models import Programacion, Asignatura,Programas
+
+def mostrar_cronograma(request):
+    if request.method == 'POST':
+       
+        
+     
+        
+        # Obtener el profesor seleccionado o mostrar un error si no existe
+        profesor_id = request.POST.get('profesor_id')
+        profesor = get_object_or_404(User.objects.filter(groups__name='Profesores'), id=profesor_id)
+
+        # Obtener todas las programaciones relacionadas con el profesor seleccionado
+        programaciones = Programacion.objects.filter(id_usuarios=profesor)
+        
+          # Obtener los códigos de asignatura de las programaciones
+        codigos_asignatura = programaciones.values_list('codigo_asignatura', flat=True)
+        
+        # Obtener los códigos del programa de las programaciones
+        codigos_programas = programaciones.values_list('programa_jornada', flat=True)
+
+        # Obtener todos los profesores disponibles para mostrar en el formulario
+        profesores = User.objects.filter(groups__name='Profesores')
+        
+        asignaturas = Asignatura.objects.filter(codigo__in=codigos_asignatura)
+        
+        programas = Programas.objects.filter(cod__in=codigos_programas)
+        
+
+        semanas = list(range(1, 17))
+        # Pasar los datos a la plantilla
+        context = {
+            'profesor_seleccionado': profesor,
+            'codigos_asignatura': codigos_asignatura,
+            'programaciones': programaciones,
+            'profesores': profesores,
+            'asignaturas':asignaturas,
+            'codigos_programas':codigos_programas,
+            'programas':programas,
+            'semanas':semanas,
+            
+        }
+
+        return render(request, 'mostrarCronograma.html', context)
+
+    # Obtener todos los profesores disponibles para mostrar en el formulario
+    profesores = User.objects.filter(groups__name='Profesores')
+
+    # Pasar los datos a la plantilla
+    context = {
+        'profesores': profesores,
+    }
+
+    return render(request, 'mostrarCronograma.html', context)
+
+

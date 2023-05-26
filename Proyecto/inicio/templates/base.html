@@ -75,6 +75,8 @@
                         <a class="collapse-item" href="{%url 'Usuarios'%}">MOSTRAR USUARIOS</a>
                         <a class="collapse-item" href="{%url 'ActivarDesactivar'%}">DESACTIVAR USUARIOS</a>
                         <a class="collapse-item" href="{%url 'Cargar'%}">CARGAR USUARIOS</a>
+                        <a class="collapse-item" href="{%url 'cargar_tabla'%}">CARGAR TABLA PRUEBA</a>
+
                         {% endif %}
                         <a class="collapse-item" href="{%url 'EditarUsuario'%}">EDITAR USUARIO</a>
 
@@ -136,7 +138,10 @@
                         <h6 class="collapse-header">DISPONIBILIDAD</h6>
                         {% if perms.auth.view_user %}
                         <a class="collapse-item" href="{%url 'registrar_disponibilidad'%}">LLENAR DISPONIBILIDAD</a>
-                        <a class="collapse-item" href="{%url 'disponibilidad'%}">VER TU DISPONIBILIDAD</a>
+                        <a class="collapse-item" href="{%url 'disponibilidad'%}">VER DISPONIBILIDAD</a>
+                        {% endif %}
+                        {% if perms.inicio.view_asignatura %}
+                        <a class="collapse-item" href="{%url 'editarDisponibilidad'%}">EDITAR DISPONIBILIDAD</a>
                         {% endif %}
                         {% if perms.auth.view_group %}
                         <a class="collapse-item" href="{%url 'seleccionar_fechas'%}">RESTRINGIR</a>
@@ -159,8 +164,8 @@
                         <h6 class="collapse-header">PROGRAMACION</h6>
                        
                         {% if perms.auth.view_group %}
-                        <a class="collapse-item" href="{%url 'programacion_nuevo'%}">PROGRAMACION</a>
-                        <a class="collapse-item" href="{%url 'ver_programacion'%}">VER PROGRAMACION</a>
+                        <a class="collapse-item" href="{%url 'mostrar_cronograma'%}">CRONOGRAMA</a>
+                        <a class="collapse-item" href="{%url 'mostrar_programacion'%}">VER PROGRAMACION</a>
                         
                         <a class="collapse-item" href="{%url 'seleccionar_fechas'%}">FECHAS</a>
                         {% endif %}

@@ -1,11 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-  
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h1 class="m-0 font-weight-bold text-danger">Disponibilidad</h1>
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h1 class="m-0 font-weight-bold text-danger">Disponibilidad</h1>
   </div>
   <div class="card-body">
     <div class="table-responsive">
@@ -14,48 +12,39 @@
         {% if messages %}
         <ul class="messages">
           {% for message in messages %}
-              <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
           {% endfor %}
-       </ul>
+        </ul>
         {% endif %}
         <div class="form-group">
           <label for="id_fecha">Fecha:</label>
           {{ form.fecha }}
-      </div>
+        </div>
         <div class="form-group">
           <label for="id_hora_inicio">Hora de inicio:</label>
-          <input type="time" name="hora_inicio" id="id_hora_inicio" class="form-control">
+          {{ form.hora_inicio }}
         </div>
         <div class="form-group">
           <label for="id_hora_fin">Hora de fin:</label>
-          <input type="time" name="hora_fin" id="id_hora_fin" class="form-control">
+          {{ form.hora_fin }}
         </div>
         <div class="form-group">
           <label for="id_comentarios">Comentarios:</label>
-          <textarea name="comentarios" id="id_comentarios" class="form-control" rows="3"></textarea>
+          {{ form.comentarios }}
         </div>
         <div class="text-right">
-        <a class="btn btn-danger" href="{% url 'disponibilidad' %}">VER DISPONIBILIDAD</a>
-        <button type="submit" class="btn btn-danger">Guardar</button>
-       
+          <a class="btn btn-danger" href="{% url 'disponibilidad' %}">VER DISPONIBILIDAD</a>
+          <button type="submit" class="btn btn-danger">Guardar</button>
         </div>
-        
       </form>
       {% if messages %}
       <ul class="messages">
         {% for message in messages %}
-            <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
-     </ul>
+      </ul>
       {% endif %}
-      <
     </div>
-      </div>
-      
-
-      
-    </div>
-
-
-    {% endblock %}
-    
+  </div>
+</div>
+{% endblock %}

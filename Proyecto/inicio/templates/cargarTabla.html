@@ -1,0 +1,11 @@
+{%extends "base.html"%}
+
+{%block content%}
+{%load static%}
+<form method="post" enctype="multipart/form-data" action="{% url 'cargar_tabla' %}">
+    {% csrf_token %}
+    <input type="file" name="archivo_excel">
+    <button type="submit">Cargar tabla</button>
+</form>
+
+{% endblock %}
