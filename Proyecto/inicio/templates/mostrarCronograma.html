@@ -2,125 +2,115 @@
 
 {% block content %}
   {% load static %}
+  
+
   <h1>Mostrar Cronograma</h1>
 
   <form method="post">
     {% csrf_token %}
+   
     <label for="profesor_id">Seleccione un profesor:</label>
-    <select name="profesor_id" id="profesor_id">
+    <select  class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="profesor_id" id="profesor_id" >
       {% for profesor in profesores %}
-        <option value="{{ profesor.id }}">{{ profesor.first_name }} {{ profesor.last_name }}</option>
+        <option value="{{ profesor.id }}">{{ profesor.first_name }} {{ profesor.last_name }} </option>
       {% endfor %}
     </select>
-    <input type="submit" value="Mostrar cronograma">
+    <input class="btn btn-outline-danger" type="submit" value="Mostrar cronograma">
+   
+    
   </form>
-
- 
-    {% if programaciones %}
+<br>
+   
+  {% if programaciones %}
     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-        <tr>
-          
-          
-          
-        </tr>
+      <tr>
         {% for programacion in programaciones %}
-          <tr>
-            {% for programa in programas %}
-            <th>PRGRAMA </th>
-            <td> {{ programa.nombre }}</td>
-            {% endfor %}
-            <th>JORNADA</th>
-            <td>{{ programacion.programa_jornada }}</td>
-            
-            <th>GRUPO</th>
-            <td>{{ programacion.codigo_grupo }}</td>
-            
-          
-          <tr>
-            <th>COD ASIGNATURA</th>
-            <td>{{ programacion.codigo_asignatura }}</td>
-            {% for asignatura in asignaturas %}
-            <th>ASIGNATURA:</th> 
-            <td> {{ asignatura.nombre }}</td>
-            <th>CREDITOS:</th> 
-            <td> {{ asignatura.creditos }}</tr>
-            {% endfor %}
-          </tr>
-          <tr>
-            <th>DOCENTE:</th>
-            <td>{{ profesor_seleccionado.first_name }} {{ profesor_seleccionado.last_name }}</td>
-            <th>E-MAIL:</th>
-            <td>{{ profesor_seleccionado.email }}</td>
-            <td colspan="2"></td>
+          {% for programa in programas %}
+            <th>PROGRAMA</th>
+            <td>{{ programa.nombre }}</td>
+          {% endfor %}
+          <th>JORNADA</th>
+          <td>{{ programacion.programa_jornada }}</td>
+          <th>GRUPO</th>
+          <td>{{ programacion.codigo_grupo }}</td>
         </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>No hay programaciones disponibles para este profesor.</p>
-    {% endif %}
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                  <thead>
-                    <tr>
-                      <th>SEMANA</th>
-                      <th>FECHA</th>
-                      <th>CONTENIDO TEMÁTICO</th>
-                      <th>MATERIAL DE APOYO</th>
-                      <th>OBSERVACIONES</th>
-                      <th>CHEQUEO</th>
-        
-                    </tr>
-                  </thead>
-                  <tbody>
-                  
-                    {% for semana in semanas %}
-                    
-                    <tr>
-                
-                      <td>SEM {{semana}}</td>
-                      <td>
-                        <form method="post">
-                          {% csrf_token %}
-                          <input type="date" name="fecha_semana{{ forloop.counter }}" value="{{ semana }}">
-                        </form>
-                      </td>
-                      <td>
-                        <form method="post">
-                          {% csrf_token %}
-                          <textarea name="contenido_semana{{ forloop.counter }}" rows="3" cols="20"></textarea>
-                        </form>
-                      </td>
-                      <td>
-                        <form method="post">
-                          {% csrf_token %}
-                          <textarea name="material_semana{{ forloop.counter }}" rows="3" cols="20"></textarea>
-                        </form>
-                      </td>
-                      <td>
-                        <form method="post">
-                          {% csrf_token %}
-                          <textarea name="observaciones{{ forloop.counter }}" rows="3" cols="20"></textarea>
-                        </form>
-                      </td>
-                      <td>
-                        <form method="post">
-                            {% csrf_token %}
-                            <select name="cumplimiento{{ forloop.counter }}">
-                                <option value="1">Cumplió</option>
-                                <option value="0">No cumplió</option>
-                            </select>
-                        </form>
-                      </td>
-                    </tr>
-                  
-                    {% endfor %}
-                    
+        <tr>
+          <th>COD ASIGNATURA</th>
+          <td>{{ programacion.codigo_asignatura }}</td>
+          {% for asignatura in asignaturas %}
+            <th>ASIGNATURA:</th> 
+            <td>{{ asignatura.nombre }}</td>
+            <th>CREDITOS:</th> 
+            <td>{{ asignatura.creditos }}</td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <th>DOCENTE:</th>
+          <td>{{ profesor_seleccionado.first_name }} {{ profesor_seleccionado.last_name }}</td>
+          <th>E-MAIL:</th>
+          <td>{{ profesor_seleccionado.email }}</td>
+          <th>USERNAME:</th>
+          <td>{{ profesor_seleccionado.username }}</td>
+          </th>
+          
+        </tr>
+      {% endfor %}
+    </table>
+    
+  {% else %}
+    <p>No hay programaciones disponibles para este profesor.</p>
+  {% endif %}
+  
+  <div class="card shadow mb-4">
+    <div class="card-body">
+      <div class="table-responsive">
+        {% if cronogramas %} 
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          
+          <thead>
+            <tr>
+              <th>SEMANA</th>
+              <th>FECHA</th>
+              <th>CONTENIDO TEMÁTICO</th>
+              <th>MATERIAL DE APOYO</th>
+              <th>OBSERVACIONES</th>
+              {% if request.user.groups.all.0.name == 'Tecnicos de apoyo' %}
+              <th>CHEQUEO</th>
+              <th>EDITAR</th>
+              {% endif %}
+              {% if request.user.groups.all.0.name == 'Secretaria academica' %}
+              <th>EDITAR</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+           
+            {% for cronograma in cronogramas %}
+              <tr>
+                <td>SEM {{ cronograma.semana }}</td>
+                <td>{{ cronograma.fecha }}</td>
+                <td>{{ cronograma.contenido_tematico }}</td>
+                <td>{{ cronograma.material_apoyo }}</td>
+                <td>{{ cronograma.observaciones }}</td>
+                {% if request.user.groups.all.0.name == 'Tecnicos de apoyo' %}  <!-- Reemplaza 'Tecnicos de apoyo' con el nombre del grupo que deseas -->
+                <td>{{ cronograma.chequeo }}</td>
+                <td><a  class="text-danger" href="{% url 'editarCronograma' cronograma.id %}" >Editar </a>
+                </td>
+                {% endif %}
 
-                  </tbody>
-                </table>
-            </div>
-        </div>
+                {% if request.user.groups.all.0.name == 'Secretaria academica' %}
+                <td><a  class="text-danger" href="{% url 'editarCronograma' cronograma.id %}" >Editar </a>
+                {% endif %}
+
+               
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No hay cronograma disponibles para este profesor.</p>
+       {% endif %}
+      </div>
     </div>
+  </div>
 {% endblock %}

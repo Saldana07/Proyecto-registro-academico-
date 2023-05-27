@@ -114,3 +114,16 @@ class Programacion(models.Model):
     def __str__(self):
         return f"{self.codigo_asignatura} - {self.grupo}"
     
+    
+class Cronograma(models.Model):
+    id = models.AutoField(primary_key=True)  # Campo de ID autoincremental
+    id_usuarios = models.ForeignKey(User, on_delete=models.CASCADE)
+    semana = models.IntegerField()
+    fecha =  models.DateTimeField(auto_now_add=True)
+    contenido_tematico = models.TextField()
+    material_apoyo = models.TextField()
+    observaciones = models.TextField()
+    chequeo = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Semana {self.semana}"

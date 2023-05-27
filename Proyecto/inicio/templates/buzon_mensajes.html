@@ -1,23 +1,37 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
 {% block content %}
-
-<h1>Buzón de mensajes</h1>
-<ul>
-{% for mensaje in mensajes_recibidos %}
-  
-  <li>
-    <strong> De: </strong>{{ mensaje.emisor }}<br>
-    <strong> Fecha de envío:</strong> {{ mensaje.fecha_envio }}<br>
-      <strong> Contenido:</strong>  {{ mensaje.contenido }}<br>
-    {% if mensaje.archivo_adjunto %}
-    <strong> Archivo adjunto:</strong>  <a href="{{ mensaje.archivo_adjunto.url }}">{{ mensaje.archivo_adjunto.name }}</a><br>
-    <strong>-----------------------------------------------------------------------</strong>
-    {% endif %}
-  </li>
-{% empty %}
-<li> No tienes mensajes recibidos.</li>
-{% endfor %}
-<ul>
-
+  <div class="container">
+    <h1>Buzón de mensajes</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>De</th>
+          <th>Fecha de envío</th>
+          <th>Contenido</th>
+          <th>Archivo adjunto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mensaje in mensajes_recibidos %}
+          <tr>
+            <td>{{ mensaje.emisor }}</td>
+            <td>{{ mensaje.fecha_envio }}</td>
+            <td>{{ mensaje.contenido }}</td>
+            <td>
+              {% if mensaje.archivo_adjunto %}
+                <a href="{{ mensaje.archivo_adjunto.url }}">{{ mensaje.archivo_adjunto.name }}</a>
+              {% else %}
+                No hay archivo adjunto
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">No tienes mensajes recibidos.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock %}

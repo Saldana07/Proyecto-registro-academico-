@@ -1,11 +1,22 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-{%block content%}
-{%load static%}
-<form method="post" enctype="multipart/form-data" action="{% url 'cargar_tabla' %}">
-    {% csrf_token %}
-    <input type="file" name="archivo_excel">
-    <button type="submit">Cargar tabla</button>
-</form>
-
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center align-items-center" style="height: 70vh;">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <h1 class="card-title">Cargar Tabla Programacion</h1>
+            <form method="post" enctype="multipart/form-data" action="{% url 'cargar_tabla' %}">
+              {% csrf_token %}
+              <div class="form-group">
+                <input type="file" name="archivo_excel" class="form-control-file">
+              </div>
+              <button type="submit" class="btn btn-outline-danger float-right">Cargar tabla</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from .models import Disponibilidad, Programas, Asignatura, Proyeccion
+from .models import Disponibilidad, Programas, Asignatura, Proyeccion,Cronograma
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
@@ -177,3 +177,46 @@ class RestringirFechasForm(forms.Form):
     )
     fecha_inicio = forms.DateField(label="Fecha de inicio")
     fecha_fin = forms.DateField(label="Fecha de fin")
+    
+class CronogramaForm(forms.Form):
+    semana = forms.IntegerField()
+    fecha = forms.DateField(label="Fecha de clase", widget=forms.DateInput(attrs={'type': 'date'}))
+    contenido_tematico = forms.CharField(widget=forms.Textarea)
+    material_apoyo = forms.CharField(widget=forms.Textarea)
+    observaciones = forms.CharField(widget=forms.Textarea)
+    chequeo = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')  # Obtener el usuario actual de los argumentos de inicialización
+        super(CronogramaForm, self).__init__(*args, **kwargs)
+        self.fields['profesor_id'] = forms.ModelChoiceField(queryset=User.objects.filter(id=user.id))
+        
+        
+
+class EditCronogramaForm(forms.Form):
+    semana = forms.IntegerField()
+    fecha = forms.DateTimeField()
+    contenido_tematico = forms.CharField(widget=forms.Textarea)
+    material_apoyo = forms.CharField(widget=forms.Textarea)
+    observaciones = forms.CharField(widget=forms.Textarea)
+    chequeo = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
+        instance = kwargs.get('instance')
+
+        if instance:
+            initial['chequeo'] = instance.chequeo
+
+        kwargs['initial'] = initial
+        super().__init__(*args, **kwargs)
+
+
+
+class EditCronogramaForm1(forms.Form):
+    semana = forms.IntegerField()
+    fecha = forms.DateTimeField()
+    contenido_tematico = forms.CharField(widget=forms.Textarea)
+    material_apoyo = forms.CharField(widget=forms.Textarea)
+    observaciones = forms.CharField(widget=forms.Textarea)
+    chequeo = forms.BooleanField(required=False)

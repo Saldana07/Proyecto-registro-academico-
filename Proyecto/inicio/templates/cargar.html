@@ -1,11 +1,27 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-{%block content%}
-{%load static%}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="ejemplo">
-    <button class="btn btn-danger" type="submit">Importar usuarios</button>
-  </form>
-
-  {% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center align-items-center" style="height: 70vh;">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title">Cargar usuarios</h1>
+          {% load static %}
+          <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+      
+      <div class="form-group">
+        <input type="file" name="ejemplo" class="form-control-file">
+      </div>
+      <button type="submit" class="btn btn-outline-danger float-right">Importar usuarios</button>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+</div>
+    </form>
+  </div>
+</div>
+{% endblock %}

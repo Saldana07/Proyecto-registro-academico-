@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Llenar datos de cronograma</h1> 
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="hidden-field">{{ form.profesor_id }}</div>
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+              <th>cronograma de:</th>
+              <th>{{ user.first_name}} {{ user.last_name}}</th>
+            </tr>
+          </thead>
+      <tbody>
+        <tr>
+        <td><label for="{{ form.fecha.id_for_label }}">Fecha:</label></td>
+          <td>{{ form.fecha }}</td>
+         
+          
+        </tr>
+        <tr>
+       
+          <td><label for="{{ form.semana.id_for_label }}">Semana:</label></td>
+          <td>{{ form.semana }}</td>
+        
+          
+        </tr>
+        <tr>
+          <td><label for="{{ form.contenido_tematico.id_for_label }}">Contenido Temático:</label></td>
+          <td colspan="3">{{ form.contenido_tematico }}</td>
+      
+        <tr>
+          <td><label for="{{ form.material_apoyo.id_for_label }}">Material de Apoyo:</label></td>
+          <td colspan="3">{{ form.material_apoyo }}</td>
+        </tr>
+        <tr>
+          <td><label for="{{ form.observaciones.id_for_label }}">Observaciones:</label></td>
+          <td colspan="3">{{ form.observaciones }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li>{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+  
+  <style>
+    /* Aplica estilos personalizados a los cuadros de texto */
+    textarea {
+      resize: none; /* Evita que se pueda redimensionar el cuadro de texto */
+      height: 50px; /* Ajusta la altura del cuadro de texto según tus necesidades */
+      width:  200px;
+    }
+  </style>
+
+  <style>
+    .hidden-field {
+        display: none;
+    }
+</style>
+
+
+
+
+
+
+
+
+{% endblock %}

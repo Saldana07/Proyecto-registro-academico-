@@ -10,13 +10,15 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.contrib import auth
-from .forms import DisponibilidadForm, LoginForm, registro_form,EditUserForm,ProyeccionForm,RestringirFechasForm,EditDisponibilidadForm
+from .forms import DisponibilidadForm, LoginForm, registro_form,EditUserForm,ProyeccionForm,RestringirFechasForm,EditDisponibilidadForm,CronogramaForm,EditCronogramaForm,EditCronogramaForm1
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, get_object_or_404
 from .models import Disponibilidad, Proyeccion,Asignatura,Mensaje,Restriccion,Programacion
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from .models import Programacion, Asignatura,Programas,Cronograma
+
 
 # Create your views here.
 def inicio_view(request):
@@ -614,69 +616,153 @@ def mostrar_programacion(request):
 
 
 
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from .models import Programacion
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from .models import Programacion
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from .models import Programacion, Asignatura,Programas
 
 def mostrar_cronograma(request):
     if request.method == 'POST':
-       
-        
-     
-        
-        # Obtener el profesor seleccionado o mostrar un error si no existe
         profesor_id = request.POST.get('profesor_id')
         profesor = get_object_or_404(User.objects.filter(groups__name='Profesores'), id=profesor_id)
-
         # Obtener todas las programaciones relacionadas con el profesor seleccionado
         programaciones = Programacion.objects.filter(id_usuarios=profesor)
-        
-          # Obtener los códigos de asignatura de las programaciones
+        # Obtener los códigos de asignatura de las programaciones
         codigos_asignatura = programaciones.values_list('codigo_asignatura', flat=True)
-        
         # Obtener los códigos del programa de las programaciones
         codigos_programas = programaciones.values_list('programa_jornada', flat=True)
-
         # Obtener todos los profesores disponibles para mostrar en el formulario
         profesores = User.objects.filter(groups__name='Profesores')
-        
         asignaturas = Asignatura.objects.filter(codigo__in=codigos_asignatura)
-        
         programas = Programas.objects.filter(cod__in=codigos_programas)
-        
-
-        semanas = list(range(1, 17))
+        # Obtener los datos del cronograma relacionados con las programaciones
+        cronogramas = Cronograma.objects.filter(id_usuarios=profesor)
         # Pasar los datos a la plantilla
         context = {
             'profesor_seleccionado': profesor,
             'codigos_asignatura': codigos_asignatura,
             'programaciones': programaciones,
             'profesores': profesores,
-            'asignaturas':asignaturas,
-            'codigos_programas':codigos_programas,
-            'programas':programas,
-            'semanas':semanas,
-            
+            'asignaturas': asignaturas,
+            'codigos_programas': codigos_programas,
+            'programas': programas,
+            'cronogramas': cronogramas,
         }
-
         return render(request, 'mostrarCronograma.html', context)
 
-    # Obtener todos los profesores disponibles para mostrar en el formulario
     profesores = User.objects.filter(groups__name='Profesores')
-
-    # Pasar los datos a la plantilla
     context = {
         'profesores': profesores,
     }
-
     return render(request, 'mostrarCronograma.html', context)
 
 
+
+
+
+
+def llenar_cronograma(request):
+    if request.method == 'POST':
+        form = CronogramaForm(request.POST, user=request.user)  # Pasar el usuario actual al formulario
+        if form.is_valid():
+            # Procesar los datos del formulario
+            semana = form.cleaned_data['semana']
+            fecha = form.cleaned_data['fecha']
+            contenido_tematico = form.cleaned_data['contenido_tematico']
+            material_apoyo = form.cleaned_data['material_apoyo']
+            observaciones = form.cleaned_data['observaciones']
+            chequeo = form.cleaned_data['chequeo']
+
+            cronograma = Cronograma(
+                id_usuarios=request.user,
+                semana=semana,
+                fecha=fecha,
+                contenido_tematico=contenido_tematico,
+                material_apoyo=material_apoyo,
+                observaciones=observaciones,
+                chequeo=chequeo
+            )
+            cronograma.save()
+            messages.success(request, '¡Los datos se han guardado exitosamente!')
+
+            # Redireccionar o mostrar un mensaje de éxito
+         
+            return redirect('/inicio/cronograma')
+
+    else:
+        initial_data = {'profesor_id': request.user}  # Establecer el valor inicial del campo profesor_id
+        form = CronogramaForm(user=request.user, initial=initial_data)  # Pasar el usuario actual y los datos iniciales al formulario
+       
+
+    return render(request, 'llenarCronograma.html', {'form': form})
+
+
+def mostrar_cronograma_a_profesor(request):
+    # Recuperar todos los objetos Cronograma de la base de datos
+    cronogramas = Cronograma.objects.all()
+
+    return render(request, 'mostrarCronogramaAprofesor.html', {'cronogramas': cronogramas})
+
+
+
+def editar_cronograma(request, cronograma_id):
+    cronograma = get_object_or_404(Cronograma, pk=cronograma_id)
+    
+    if request.method == 'POST':
+        form = EditCronogramaForm(request.POST)
+        if form.is_valid():
+            cronograma.semana = form.cleaned_data['semana']
+            cronograma.fecha = form.cleaned_data['fecha']
+            cronograma.contenido_tematico = form.cleaned_data['contenido_tematico']
+            cronograma.material_apoyo = form.cleaned_data['material_apoyo']
+            cronograma.observaciones = form.cleaned_data['observaciones']
+            cronograma.chequeo = form.cleaned_data['chequeo']
+            cronograma.save()
+            # Redirigir a una página de éxito o realizar otras acciones
+            return redirect('/inicio/cronograma')
+            
+    else:
+        
+        form = EditCronogramaForm(initial={
+            'semana': cronograma.semana,
+            'fecha': cronograma.fecha,
+            'contenido_tematico': cronograma.contenido_tematico,
+            'material_apoyo': cronograma.material_apoyo,
+            'observaciones': cronograma.observaciones,
+            'chequeo': cronograma.chequeo
+        })
+    
+    context = {
+        'form': form
+    }
+    
+    return render(request, 'editarCronograma.html', context)
+
+def editar_cronograma1(request, cronograma_id):
+    cronograma = get_object_or_404(Cronograma, pk=cronograma_id)
+    
+    if request.method == 'POST':
+        form = EditCronogramaForm1(request.POST)
+        if form.is_valid():
+            cronograma.semana = form.cleaned_data['semana']
+            cronograma.fecha = form.cleaned_data['fecha']
+            cronograma.contenido_tematico = form.cleaned_data['contenido_tematico']
+            cronograma.material_apoyo = form.cleaned_data['material_apoyo']
+            cronograma.observaciones = form.cleaned_data['observaciones']
+            cronograma.chequeo = form.cleaned_data['chequeo']
+            cronograma.save()
+            # Redirigir a una página de éxito o realizar otras acciones
+            return redirect('/inicio/mostrar_cronograma')
+            
+    else:
+        form = EditCronogramaForm1(initial={
+            'semana': cronograma.semana,
+            'fecha': cronograma.fecha,
+            'contenido_tematico': cronograma.contenido_tematico,
+            'material_apoyo': cronograma.material_apoyo,
+            'observaciones': cronograma.observaciones,
+            'chequeo': cronograma.chequeo
+        })
+    
+    context = {
+        'form': form
+    }
+    
+    return render(request, 'editarCronograma.html', context)

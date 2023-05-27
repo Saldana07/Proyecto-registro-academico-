@@ -75,7 +75,7 @@
                         <a class="collapse-item" href="{%url 'Usuarios'%}">MOSTRAR USUARIOS</a>
                         <a class="collapse-item" href="{%url 'ActivarDesactivar'%}">DESACTIVAR USUARIOS</a>
                         <a class="collapse-item" href="{%url 'Cargar'%}">CARGAR USUARIOS</a>
-                        <a class="collapse-item" href="{%url 'cargar_tabla'%}">CARGAR TABLA PRUEBA</a>
+                        
 
                         {% endif %}
                         <a class="collapse-item" href="{%url 'EditarUsuario'%}">EDITAR USUARIO</a>
@@ -163,12 +163,19 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">PROGRAMACION</h6>
                        
-                        {% if perms.auth.view_group %}
+                        
+                        {% if perms.inicio.view_restriccion %}
+                        <a class="collapse-item" href="{%url 'cargar_tabla'%}">CARGAR TABLA </a>
                         <a class="collapse-item" href="{%url 'mostrar_cronograma'%}">CRONOGRAMA</a>
                         <a class="collapse-item" href="{%url 'mostrar_programacion'%}">VER PROGRAMACION</a>
+                        {% endif %}
+                        {% if perms.inicio.delete_restriccion %}
+                        <a class="collapse-item" href="{%url 'mostrar_cronogramaProfesor'%}">CRONOGRAMA</a>
+                        <a class="collapse-item" href="{%url 'llenar_cronograma'%}">LLENAR CRONOGRAMA</a>
+                        {% endif %}
                         
                         <a class="collapse-item" href="{%url 'seleccionar_fechas'%}">FECHAS</a>
-                        {% endif %}
+                        
                     </div>
                 </div>
             </li>

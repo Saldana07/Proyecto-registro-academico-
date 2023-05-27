@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 
-from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Restriccion,Programacion
+from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Restriccion,Programacion,Cronograma
 
 #from django.contrib.auth.models import User, Group
 
@@ -53,3 +53,7 @@ admin.site.register(Restriccion, RestriccionAdmin)
 class ProgramacionAdmin(admin.ModelAdmin):
     list_display = ('id', 'programa_jornada', 'codigo_asignatura', 'grupo', 'codigo_grupo', 'cupo', 'cupo_generico','id_usuarios')
 admin.site.register(Programacion,ProgramacionAdmin)
+
+class CronogramaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'id_usuarios', 'semana', 'fecha', 'contenido_tematico', 'material_apoyo', 'observaciones', 'chequeo')
+admin.site.register(Cronograma,CronogramaAdmin)
