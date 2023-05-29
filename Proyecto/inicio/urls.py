@@ -37,7 +37,9 @@ urlpatterns = [
     path('cronograma', views.mostrar_cronograma_a_profesor, name='mostrar_cronogramaProfesor'),
     path('cronograma/editar/<int:cronograma_id>/', views.editar_cronograma, name='editar_cronograma'),
     path('cronogramaedit/editar/<int:cronograma_id>/', views.editar_cronograma1, name='editarCronograma'),
-    
+    path('activar/<int:cronograma_id>/', views.activar_cronograma, name='activar_cronograma'),
+    path('desactivar/<int:cronograma_id>/', views.desactivar_cronograma, name='desactivar_cronograma'),
+
 
   
     

@@ -63,6 +63,7 @@
                                                 <tbody>
                                                     
                                                     {% for cronograma in cronogramas %}
+                                                    {% if cronograma.mostrar_en_tabla == True %}
                                                     {% if cronograma.id_usuarios == request.user %}
                                                     <tr>
                                                         <td>{{ cronograma.semana }}</td>
@@ -76,6 +77,21 @@
 
                                                     </tr>
                                                     {% endif %}
+                                                    {% else %}
+
+                                                    <tr>
+                                                        
+                                                            <td colspan="7">No se encontraron cronogramas para mostrar.
+                                                                <br>
+                                                                Puede estar Desactivado o no has realizado un cronograma.
+                                                            </td>
+                                                          
+                                                       
+                                                       
+
+                                                    </tr>
+                                                    {% endif %}
+
                                                     {% endfor %}
                                                     
 

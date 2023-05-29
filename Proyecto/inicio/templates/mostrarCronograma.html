@@ -80,6 +80,8 @@
               {% endif %}
               {% if request.user.groups.all.0.name == 'Secretaria academica' %}
               <th>EDITAR</th>
+              <th>ACCION</th>
+
               {% endif %}
             </tr>
           </thead>
@@ -100,8 +102,24 @@
 
                 {% if request.user.groups.all.0.name == 'Secretaria academica' %}
                 <td><a  class="text-danger" href="{% url 'editarCronograma' cronograma.id %}" >Editar </a>
-                {% endif %}
 
+                  <td>
+                    {% if cronograma.mostrar_en_tabla %}
+                    <form action="{% url 'desactivar_cronograma' cronograma_id=cronograma.id %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-link text-danger">Desactivar</button>
+                    </form>
+                  {% else %}
+                    <form action="{% url 'activar_cronograma' cronograma_id=cronograma.id %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-link text-danger">Activar</button>
+                    </form>
+                  {% endif %}
+                 
+
+                </td>
+                {% endif %}
+               
                
               </tr>
             {% endfor %}

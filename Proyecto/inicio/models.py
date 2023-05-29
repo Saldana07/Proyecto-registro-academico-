@@ -124,6 +124,7 @@ class Cronograma(models.Model):
     material_apoyo = models.TextField()
     observaciones = models.TextField()
     chequeo = models.BooleanField(default=False)
+    mostrar_en_tabla = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Semana {self.semana}"

@@ -766,3 +766,16 @@ def editar_cronograma1(request, cronograma_id):
     }
     
     return render(request, 'editarCronograma.html', context)
+
+
+def activar_cronograma(request, cronograma_id):
+    cronograma = get_object_or_404(Cronograma, id=cronograma_id)
+    cronograma.mostrar_en_tabla = True 
+    cronograma.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+def desactivar_cronograma(request, cronograma_id):
+    cronograma = get_object_or_404(Cronograma, id=cronograma_id)
+    cronograma.mostrar_en_tabla = False
+    cronograma.save()
+    return redirect(request.META.get('HTTP_REFERER', '/'))

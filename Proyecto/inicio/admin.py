@@ -55,5 +55,5 @@ class ProgramacionAdmin(admin.ModelAdmin):
 admin.site.register(Programacion,ProgramacionAdmin)
 
 class CronogramaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_usuarios', 'semana', 'fecha', 'contenido_tematico', 'material_apoyo', 'observaciones', 'chequeo')
+    list_display = ('id', 'id_usuarios', 'semana', 'fecha', 'contenido_tematico', 'material_apoyo', 'observaciones', 'chequeo','mostrar_en_tabla')
 admin.site.register(Cronograma,CronogramaAdmin)
