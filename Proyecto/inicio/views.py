@@ -779,3 +779,95 @@ def desactivar_cronograma(request, cronograma_id):
     cronograma.mostrar_en_tabla = False
     cronograma.save()
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+from django.shortcuts import render
+from django.db.models import Count
+from .models import Cronograma
+from django.contrib.auth.models import User, Group
+
+def contador_registros(request):
+    # Obtén el grupo "profesor"
+    grupo_profesor = Group.objects.get(name='Profesores')
+
+    # Obtén todos los usuarios del grupo "profesor"
+    usuarios_profesor = User.objects.filter(groups=grupo_profesor)
+
+    # Realiza la agregación para contar el número de registros por usuario
+    contador_registros = Cronograma.objects.filter(id_usuarios__in=usuarios_profesor).values('id_usuarios').annotate(total_registros=Count('id'))
+
+    # Crea un diccionario para almacenar el número de registros y el nombre de usuario por usuario
+    registros_por_usuario = {usuario.id: {'username': usuario.username, 'total_registros': 0} for usuario in usuarios_profesor}
+
+    # Actualiza el diccionario con el número de registros contados
+    for contador in contador_registros:
+        usuario_id = contador['id_usuarios']
+        total_registros = contador['total_registros']
+        registros_por_usuario[usuario_id]['total_registros'] = total_registros
+
+    # Pasa los datos a la plantilla para su visualización
+    context = {
+        'registros_por_usuario': registros_por_usuario,
+    }
+
+    return render(request, 'contador_registros.html', context)
+
+
+def verCronograma(request, profesor_id):
+    try:
+        profesor = User.objects.get(id=profesor_id)
+        cronogramas = Cronograma.objects.filter(id_usuarios=profesor)
+    except User.DoesNotExist:
+        cronogramas = None
+
+    context = {
+        'profesor': profesor,
+        'cronogramas': cronogramas,
+    }
+
+    return render(request, 'verCronograma.html', context)
+
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment
+from django.http import HttpResponse
+from .models import Cronograma  # Importa el modelo de los cronogramas
+from django.utils import timezone
+
+def descargar_reporte_excel(request, id_usuario):
+    # Obtén los cronogramas del usuario especificado por ID
+    cronogramas = Cronograma.objects.filter(id_usuarios =id_usuario)
+
+    # Crea un nuevo libro de trabajo de Excel
+    wb = Workbook()
+    sheet = wb.active
+
+    # Agrega los encabezados de columna
+    encabezados = ['Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']
+    for col_num, encabezado in enumerate(encabezados, 1):
+        col_letra = get_column_letter(col_num)
+        sheet[f'{col_letra}1'] = encabezado
+        sheet[f'{col_letra}1'].alignment = Alignment(horizontal='center')
+
+    # Agrega los datos de los cronogramas al libro de trabajo
+    row_index = 2
+    for cronograma in cronogramas:
+        sheet[f'A{row_index}'] = cronograma.semana
+        sheet[f'B{row_index}'] = cronograma.fecha.replace(tzinfo=None) if cronograma.fecha else None
+        sheet[f'C{row_index}'] = cronograma.contenido_tematico
+        sheet[f'D{row_index}'] = cronograma.material_apoyo
+        sheet[f'E{row_index}'] = cronograma.observaciones
+        row_index += 1
+
+    # Ajusta el ancho de las columnas automáticamente
+    for column_cells in sheet.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        sheet.column_dimensions[column_cells[0].column_letter].width = length
+
+    # Guarda el libro de trabajo en un objeto de tipo HttpResponse
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="reporte.xlsx"'
+    wb.save(response)
+
+    return response
+

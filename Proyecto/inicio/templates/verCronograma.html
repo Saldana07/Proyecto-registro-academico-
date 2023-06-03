@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">Mostrar Cronograma</h6>
+  </div>
+  <div class="card-body">
+    {% if profesor %}
+      <h3>Profesor: {{ profesor.first_name }} {{ profesor.last_name }}</h3>
+      {% if cronogramas %}
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Semana</th>
+                <th>Fecha</th>
+                <th>Contenido Temático</th>
+                <th>Material de Apoyo</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cronograma in cronogramas %}
+                <tr>
+                  <td>{{ cronograma.semana }}</td>
+                  <td>{{ cronograma.fecha }}</td>
+                  <td>{{ cronograma.contenido_tematico }}</td>
+                  <td>{{ cronograma.material_apoyo }}</td>
+                  <td>{{ cronograma.observaciones }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <a class="btn btn-outline-danger float-right" href="{% url 'contador_registros' %}">Volver</a>
+    <a class="btn btn-outline-danger float-right" href="{% url 'descargar_reporte_excel' id_usuario=profesor.id %}">Descargar Excel</a>
+
+      {% else %}
+        <p>No hay cronogramas disponibles para este profesor.</p>
+        <a class="btn btn-outline-danger float-right" href="{% url 'contador_registros' %}">Volver</a>
+      {% endif %}
+    {% else %}
+      <p>No se ha seleccionado ningún profesor.</p>
+      <a class="btn btn-outline-danger float-right" href="{% url 'contador_registros' %}">Volver</a>
+    {% endif %}
+   
+</td>
+  </div>
+</div>
+{% endblock %}

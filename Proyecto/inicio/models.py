@@ -128,3 +128,6 @@ class Cronograma(models.Model):
 
     def __str__(self):
         return f"Semana {self.semana}"
+    
+    
+    

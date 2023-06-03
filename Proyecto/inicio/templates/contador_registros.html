@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Profesor</th>
+                        <th>Registros</th>
+                        <th>Ver</th>
+                      
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario, datos in registros_por_usuario.items %}
+                    <tr>
+                        <td>{{ usuario }}</td>
+                        <td>{{ datos.username }}</td>
+                        <td>{{ datos.total_registros }}</td>
+                        <td><a class=" btn-link text-danger" href="{% url 'ver_cronograma' profesor_id=usuario %}">Ver</a></td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

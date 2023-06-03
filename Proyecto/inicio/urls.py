@@ -39,7 +39,10 @@ urlpatterns = [
     path('cronogramaedit/editar/<int:cronograma_id>/', views.editar_cronograma1, name='editarCronograma'),
     path('activar/<int:cronograma_id>/', views.activar_cronograma, name='activar_cronograma'),
     path('desactivar/<int:cronograma_id>/', views.desactivar_cronograma, name='desactivar_cronograma'),
-
+    path('contador-registros', views.contador_registros, name='contador_registros'),
+    path('ver_cronograma/<int:profesor_id>/', views.verCronograma, name='ver_cronograma'),
+    path('descargar_reporte_excel/<int:id_usuario>/', views.descargar_reporte_excel, name='descargar_reporte_excel'),
+    
 
   
     
