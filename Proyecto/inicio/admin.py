@@ -15,7 +15,7 @@ class AsignaturaAdmin(admin.ModelAdmin):
 admin.site.register(Asignatura, AsignaturaAdmin)
 
 class ProgramasAdmin(admin.ModelAdmin):
-    list_display = ('codigo','cod', 'nombre', 'correo', 'jornada')
+    list_display = ('codigo','cod', 'nombre', 'correo', 'jornada','tecnico_apoyo')
 
 
 admin.site.register(Programas, ProgramasAdmin)

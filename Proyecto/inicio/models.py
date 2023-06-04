@@ -12,6 +12,8 @@ class Programas(models.Model):
     nombre = models.CharField(max_length=200)
     correo = models.CharField(max_length=200)
     jornada = models.CharField(max_length=200)
+    tecnico_apoyo = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='programas')
+
     def __str__(self):
         return self.nombre
     

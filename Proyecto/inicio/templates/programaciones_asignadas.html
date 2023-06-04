@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+        <div class="card-body">
+            <div class="table-responsive"> 
+
+      {% if programa_tecnico %}
+        <h3>Técnico de apoyo del programa: {{ programa_tecnico }}</h3>
+      {% else %}
+        <p>No se encontró un programa técnico asignado</p>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <label for="usuario_id">Seleccione un usuario:</label>
+        <select class="form-select" name="usuario_id" id="usuario_id">
+          <option value="todos">Todos los usuarios</option>
+          {% for programacion in programaciones_asignadas %}
+            <option value="{{ programacion.id_usuarios }}">{{ programacion.id_usuarios.username }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline-danger float-right">Ver Cronograma</button>
+      </form>
+
+      {% if cronogramas_asignados %}
+        <br>
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Profesor</th>
+              <th>Semana</th>
+              <th>Fecha</th>
+              <th>Contenido Temático</th>
+              <th>Material de Apoyo</th>
+              <th>Observaciones</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for cronograma in cronogramas_asignados %}
+              <tr>
+                <td>{{ cronograma.id_usuarios }}</td>
+                <td>{{ cronograma.semana }}</td>
+                <td>{{ cronograma.fecha }}</td>
+                <td>{{ cronograma.contenido_tematico }}</td>
+                <td>{{ cronograma.material_apoyo }}</td>
+                <td>{{ cronograma.observaciones }}</td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if usuario_id != 'todos' and cronogramas_asignados %}
+        <button type="button" class="btn btn-outline-danger float-right" data-toggle="modal" data-target="#modalDescarga">Descargar Cronograma</button>
+      {% endif %}
+      
+<!-- Modal de descarga -->
+<div class="modal fade" id="modalDescarga" tabindex="-1" role="dialog" aria-labelledby="modalDescargaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDescargaLabel">Descargar Cronograma</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Seleccione una opción de descarga:</p>
+          <div class="text-center">
+            <a href="{% url 'descargar_reporteExcel' cronogramas_asignados.first.id_usuarios.id %}" class="btn btn-outline-danger">Descargar Excel</a>
+            <a href="{% url 'descargar_reportePdf' cronogramas_asignados.first.id_usuarios.id %}" class="btn btn-outline-danger">Descargar Pdf</a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+      {% else %}
+        <p>No se encontraron cronogramas asignados</p>
+      {% endif %}
+      
+    </div>
+  </div>
+{% endblock %}

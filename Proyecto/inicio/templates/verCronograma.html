@@ -13,6 +13,7 @@
           <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
               <tr>
+                <th>Username</th>
                 <th>Semana</th>
                 <th>Fecha</th>
                 <th>Contenido Temático</th>
@@ -23,6 +24,7 @@
             <tbody>
               {% for cronograma in cronogramas %}
                 <tr>
+                  <td>{{ cronograma.id_usuarios }}</td>
                   <td>{{ cronograma.semana }}</td>
                   <td>{{ cronograma.fecha }}</td>
                   <td>{{ cronograma.contenido_tematico }}</td>
@@ -34,8 +36,34 @@
           </table>
         </div>
         <a class="btn btn-outline-danger float-right" href="{% url 'contador_registros' %}">Volver</a>
-    <a class="btn btn-outline-danger float-right" href="{% url 'descargar_reporte_excel' id_usuario=profesor.id %}">Descargar Excel</a>
-
+        <button type="button" class="btn btn-outline-danger float-right" data-toggle="modal" data-target="#modalDescargaReporte">
+          Descargar Reporte
+        </button>
+  
+    <!-- Modal de Descarga de Reporte -->
+<div class="modal fade" id="modalDescargaReporte" tabindex="-1" role="dialog" aria-labelledby="modalDescargaReporteLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDescargaReporteLabel">Descargar Reporte</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Seleccione el formato de descarga:</p>
+        <div class="text-center">
+          <a class="btn btn-outline-danger" href="{% url 'descargar_reporte_excel' id_usuario=profesor.id %}">Descargar Excel</a>
+          <a class="btn btn-outline-danger" href="{% url 'descargar-reporte_pdf' id_usuario=profesor.id %}">Descargar PDF</a>
+        </div>
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
       {% else %}
         <p>No hay cronogramas disponibles para este profesor.</p>
         <a class="btn btn-outline-danger float-right" href="{% url 'contador_registros' %}">Volver</a>

@@ -78,7 +78,7 @@
               <th>CHEQUEO</th>
               <th>EDITAR</th>
               {% endif %}
-              {% if request.user.groups.all.0.name == 'Secretaria academica' %}
+              {% if request.user.groups.all.0.name == 'Secretaria academica' or 'Profesor de apoyo'  %}
               <th>EDITAR</th>
               <th>ACCION</th>
 
@@ -100,7 +100,7 @@
                 </td>
                 {% endif %}
 
-                {% if request.user.groups.all.0.name == 'Secretaria academica' %}
+                {% if request.user.groups.all.0.name == 'Secretaria academica' or 'Profesor de apoyo'  %}
                 <td><a  class="text-danger" href="{% url 'editarCronograma' cronograma.id %}" >Editar </a>
 
                   <td>

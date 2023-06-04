@@ -42,7 +42,12 @@ urlpatterns = [
     path('contador-registros', views.contador_registros, name='contador_registros'),
     path('ver_cronograma/<int:profesor_id>/', views.verCronograma, name='ver_cronograma'),
     path('descargar_reporte_excel/<int:id_usuario>/', views.descargar_reporte_excel, name='descargar_reporte_excel'),
-    
+    path('descargar-reporte-pdf/<int:id_usuario>/', views.descargar_reporte_pdf, name='descargar-reporte_pdf'),
+    path('programaciones-asignadas', views.programaciones_asignadas_view, name='programaciones_asignadas'),
+    path('descargar-reporte/<str:id_usuario>/', views.descargar_reporte_view, name='descargar_reporteExcel'),
+    path('inicio/descargar-reporte/<str:id_usuario>/', views.descargar_reporte_viewpdf, name='descargar_reportePdf'),
+
+
 
   
     

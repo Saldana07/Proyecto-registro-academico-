@@ -54,13 +54,31 @@
                                 <th><a href="?ordenar_por=hora_fin">Hora de fin</a></th>
                                 <th><a href="?ordenar_por=comentarios">Comentarios</a></th>
                                 <th>Editar</th>
+                                {% if request.user.groups.all.0.name != 'Profesores' %}
                                 <th>Accions</th>
-
+                              {% endif %}
+                                
                             </tr>
                         </thead>
+                        
                         <tbody>
+                            {% if request.user.groups.all.0.name == 'Profesores' %}
                             {% for d in disponibilidad %}
-                            <tr>
+                              {% if d.profesor == request.user %}
+                                <tr>
+                                  <td>{{ d.profesor.username }}</td>
+                                  <td>{{ d.fecha }}</td>
+                                  <td>{{ d.hora_inicio }}</td>
+                                  <td>{{ d.hora_fin }}</td>
+                                  <td>{{ d.comentarios }}</td>
+                                  <td><a class="text-danger" href="{% url 'editar_disponibilidad' disponibilidad_id=d.id %}">Editar</a></td>
+                                  
+                                </tr>
+                              {% endif %}
+                            {% endfor %}
+                          {% else %}
+                            {% for d in disponibilidad %}
+                              <tr>
                                 <td>{{ d.profesor.username }}</td>
                                 <td>{{ d.fecha }}</td>
                                 <td>{{ d.hora_inicio }}</td>
@@ -68,7 +86,7 @@
                                 <td>{{ d.comentarios }}</td>
                                 <td><a class="text-danger" href="{% url 'editar_disponibilidad' disponibilidad_id=d.id %}">Editar</a></td>
                                 <td>
-                                    {% if d.mostrar_en_tabla %}
+                                  {% if d.mostrar_en_tabla %}
                                     <form action="{% url 'desactivar_disponibilidad' disponibilidad_id=d.id %}" method="post">
                                       {% csrf_token %}
                                       <button type="submit" class="btn btn-link text-danger">Desactivar</button>
@@ -80,9 +98,13 @@
                                     </form>
                                   {% endif %}
                                 </td>
-                            </tr>
+                              </tr>
                             {% endfor %}
+                          {% endif %}
+                          
                         </tbody>
+                        
+                        
                     </table>
                 </div>
 

@@ -19,17 +19,32 @@
                     </tr>
                 </thead>
                 <tbody>
+                    
+                    {% if request.user.groups.all.0.name == 'Profesores' %}
                     {% for usuario, datos in registros_por_usuario.items %}
-                    <tr>
-                        <td>{{ usuario }}</td>
-                        <td>{{ datos.username }}</td>
-                        <td>{{ datos.total_registros }}</td>
-                        <td><a class=" btn-link text-danger" href="{% url 'ver_cronograma' profesor_id=usuario %}">Ver</a></td>
-
-                    </tr>
+                        {% if datos.username == request.user.username %}
+                            <tr>
+                                <td>{{ usuario }}</td>
+                                <td>{{ datos.username }}</td>
+                                <td>{{ datos.total_registros }}</td>
+                                <td><a class="btn-link text-danger" href="{% url 'ver_cronograma' profesor_id=usuario %}">Ver</a></td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
+                {% else %}
+                    {% for usuario, datos in registros_por_usuario.items %}
+                        <tr>
+                            <td>{{ usuario }}</td>
+                            <td>{{ datos.username }}</td>
+                            <td>{{ datos.total_registros }}</td>
+                            <td><a class="btn-link text-danger" href="{% url 'ver_cronograma' profesor_id=usuario %}">Ver</a></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                
                 </tbody>
             </table>
+            
         </div>
     </div>
 </div>

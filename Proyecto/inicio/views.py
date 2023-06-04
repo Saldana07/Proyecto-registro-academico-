@@ -843,7 +843,7 @@ def descargar_reporte_excel(request, id_usuario):
     sheet = wb.active
 
     # Agrega los encabezados de columna
-    encabezados = ['Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']
+    encabezados = ['Username','Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']
     for col_num, encabezado in enumerate(encabezados, 1):
         col_letra = get_column_letter(col_num)
         sheet[f'{col_letra}1'] = encabezado
@@ -852,11 +852,12 @@ def descargar_reporte_excel(request, id_usuario):
     # Agrega los datos de los cronogramas al libro de trabajo
     row_index = 2
     for cronograma in cronogramas:
-        sheet[f'A{row_index}'] = cronograma.semana
-        sheet[f'B{row_index}'] = cronograma.fecha.replace(tzinfo=None) if cronograma.fecha else None
-        sheet[f'C{row_index}'] = cronograma.contenido_tematico
-        sheet[f'D{row_index}'] = cronograma.material_apoyo
-        sheet[f'E{row_index}'] = cronograma.observaciones
+        sheet[f'A{row_index}'] = cronograma.id_usuarios.username
+        sheet[f'B{row_index}'] = cronograma.semana
+        sheet[f'C{row_index}'] = cronograma.fecha.replace(tzinfo=None) if cronograma.fecha else None
+        sheet[f'D{row_index}'] = cronograma.contenido_tematico
+        sheet[f'E{row_index}'] = cronograma.material_apoyo
+        sheet[f'F{row_index}'] = cronograma.observaciones
         row_index += 1
 
     # Ajusta el ancho de las columnas automáticamente
@@ -871,3 +872,172 @@ def descargar_reporte_excel(request, id_usuario):
 
     return response
 
+from django.http import HttpResponse
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+def descargar_reporte_pdf(request, id_usuario):
+    # Obtén los cronogramas del usuario especificado por ID
+    cronogramas = Cronograma.objects.filter(id_usuarios=id_usuario)
+
+    # Crea un nuevo objeto de lienzo de PDF
+    response = HttpResponse(content_type='application/pdf')
+    
+    response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+
+    # Crea el documento PDF con el tamaño de página letter
+    doc = SimpleDocTemplate(response, pagesize=letter)
+
+    # Estilos de celda para el encabezado y los datos
+    estilo_celda_encabezado = [('BACKGROUND', (0, 0), (-1, 0), colors.red)]
+    estilo_celda_datos = [('GRID', (0, 0), (-1, -1), 1, colors.black)]
+
+    # Crea la tabla con los datos de los cronogramas
+    data = [['Profesor', 'Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']]
+    for cronograma in cronogramas:
+        data.append([
+            cronograma.id_usuarios.username,
+            cronograma.semana,
+            cronograma.fecha.strftime('%Y-%m-%d') if cronograma.fecha else None,
+            cronograma.contenido_tematico,
+            cronograma.material_apoyo,
+            cronograma.observaciones
+        ])
+
+    tabla = Table(data)
+    tabla.setStyle(TableStyle(estilo_celda_encabezado + estilo_celda_datos))
+
+    # Construye el documento PDF
+    elementos = [tabla]
+    doc.build(elementos)
+
+    return response
+
+from django.shortcuts import render
+from django.contrib.auth.models import User
+from .models import Programas, Programacion, Cronograma
+
+def programaciones_asignadas_view(request):
+    programa_tecnico = None
+    programaciones_asignadas = None
+    cronogramas_asignados = None
+
+    if request.user.groups.filter(name='Tecnicos de apoyo').exists():
+        tecnico_apoyo = request.user.programas.first()
+        if tecnico_apoyo:
+            programa_tecnico = tecnico_apoyo.cod
+            programaciones_asignadas = Programacion.objects.filter(programa_jornada=programa_tecnico)
+            
+            if request.method == 'POST':
+                usuario_id = request.POST.get('usuario_id')
+                id_usuarios = programaciones_asignadas.values_list('id_usuarios', flat=True)
+                if usuario_id == 'todos':
+                    cronogramas_asignados = Cronograma.objects.filter(id_usuarios__in=id_usuarios)
+                else:
+                    cronogramas_asignados = Cronograma.objects.filter(id_usuarios__username=usuario_id)
+    programas_asignados = Programas.objects.filter(tecnico_apoyo=request.user)
+
+    context = {
+        'programas_asignados': programas_asignados,
+        'programa_tecnico': programa_tecnico,
+        'programaciones_asignadas': programaciones_asignadas,
+        'cronogramas_asignados': cronogramas_asignados,
+    }
+    return render(request, 'programaciones_asignadas.html', context)
+
+
+
+def descargar_reporte_view(request, id_usuario):
+    if id_usuario == 'todos':
+        # Obtén todos los cronogramas
+        cronogramas = Cronograma.objects.all()
+    else:
+        # Verifica si se seleccionó un usuario específico o el valor es inválido
+        try:
+            usuario = User.objects.get(id=id_usuario)
+            cronogramas = Cronograma.objects.filter(id_usuarios=usuario)
+        except User.DoesNotExist:
+            cronogramas = None
+
+    if cronogramas is None:
+        # Manejo de error: usuario inválido
+        return HttpResponse('Usuario inválido.')
+
+    # Crea un nuevo libro de trabajo de Excel
+    wb = Workbook()
+    sheet = wb.active
+
+    # Agrega los encabezados de columna
+    encabezados = ['Profesor', 'Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']
+    for col_num, encabezado in enumerate(encabezados, 1):
+        col_letra = get_column_letter(col_num)
+        sheet[f'{col_letra}1'] = encabezado
+        sheet[f'{col_letra}1'].alignment = Alignment(horizontal='center')
+
+    # Agrega los datos de los cronogramas al libro de trabajo
+    row_index = 2
+    for cronograma in cronogramas:
+        sheet[f'A{row_index}'] = cronograma.id_usuarios.username
+        sheet[f'B{row_index}'] = cronograma.semana
+        sheet[f'C{row_index}'] = cronograma.fecha.strftime('%Y-%m-%d') if cronograma.fecha else None
+        sheet[f'D{row_index}'] = cronograma.contenido_tematico
+        sheet[f'E{row_index}'] = cronograma.material_apoyo
+        sheet[f'F{row_index}'] = cronograma.observaciones
+        row_index += 1
+
+    # Ajusta el ancho de las columnas automáticamente
+    for column_cells in sheet.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        sheet.column_dimensions[column_cells[0].column_letter].width = length
+
+    # Guarda el libro de trabajo en un objeto de tipo HttpResponse
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="reporte.xlsx"'
+    wb.save(response)
+
+    return response
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib import colors
+
+def descargar_reporte_viewpdf(request, id_usuario):
+    if id_usuario == 'todos':
+        # Obtén todos los cronogramas
+        cronogramas = Cronograma.objects.all()
+    else:
+        # Obtén los cronogramas del usuario especificado por ID
+        cronogramas = Cronograma.objects.filter(id_usuarios=id_usuario)
+
+    # Crea un documento PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+
+    # Configura el documento PDF
+    doc = SimpleDocTemplate(response, pagesize=letter)
+
+    # Define los estilos de la tabla
+    estilo_celda_encabezado = [('BACKGROUND', (0, 0), (-1, 0), colors.red)]
+    estilo_celda_datos = [('GRID', (0, 0), (-1, -1), 1, colors.black)]
+
+    # Crea la tabla con los datos de los cronogramas
+    data = [['Profesor', 'Semana', 'Fecha', 'Contenido Temático', 'Material de Apoyo', 'Observaciones']]
+    for cronograma in cronogramas:
+        data.append([
+            cronograma.id_usuarios.username,
+            cronograma.semana,
+            cronograma.fecha.strftime('%Y-%m-%d') if cronograma.fecha else None,
+            cronograma.contenido_tematico,
+            cronograma.material_apoyo,
+            cronograma.observaciones
+        ])
+
+    tabla = Table(data)
+    tabla.setStyle(TableStyle(estilo_celda_encabezado + estilo_celda_datos))
+
+    # Construye el documento PDF
+    elementos = [tabla]
+    doc.build(elementos)
+
+    return response
