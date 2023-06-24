@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 
-from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Restriccion,Programacion,Cronograma
+from .models import Proyeccion,Asignatura,Programas,Mensaje,Disponibilidad,Restriccion,Programacion,Cronograma,Asistencia, Salones
 
 #from django.contrib.auth.models import User, Group
 
@@ -51,9 +51,20 @@ admin.site.register(Restriccion, RestriccionAdmin)
 
 
 class ProgramacionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'programa_jornada', 'codigo_asignatura', 'grupo', 'codigo_grupo', 'cupo', 'cupo_generico','id_usuarios')
+    list_display = ('id', 'programa_jornada', 'codigo_asignatura', 'grupo', 'codigo_grupo', 'cupo', 'cupo_generico','salon','id_usuarios')
 admin.site.register(Programacion,ProgramacionAdmin)
 
 class CronogramaAdmin(admin.ModelAdmin):
     list_display = ('id', 'id_usuarios', 'semana', 'fecha', 'contenido_tematico', 'material_apoyo', 'observaciones', 'chequeo','mostrar_en_tabla')
 admin.site.register(Cronograma,CronogramaAdmin)
+
+
+class AsistenciaAdmin(admin.ModelAdmin):
+     list_display = ('id', 'cronograma', 'usuario', 'fecha', 'asistio', 'noAsistio','fecha_recuperacion','tema_clase','salon')
+admin.site.register(Asistencia,AsistenciaAdmin)
+
+
+
+class SalonesAdmin(admin.ModelAdmin):
+     list_display = ('id','nombre','tipo','capacidad')
+admin.site.register(Salones,SalonesAdmin)

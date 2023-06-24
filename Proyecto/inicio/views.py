@@ -13,7 +13,7 @@ from django.contrib import auth
 from .forms import DisponibilidadForm, LoginForm, registro_form,EditUserForm,ProyeccionForm,RestringirFechasForm,EditDisponibilidadForm,CronogramaForm,EditCronogramaForm,EditCronogramaForm1
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, get_object_or_404
-from .models import Disponibilidad, Proyeccion,Asignatura,Mensaje,Restriccion,Programacion
+from .models import Disponibilidad, Proyeccion,Asignatura,Mensaje,Restriccion,Programacion, Salones
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
@@ -576,6 +576,18 @@ def cargar_tabla(request):
                         intensidad=creditos * 2
                     )
             asignatura.save()
+            try:
+                # Verificar si el salon ya existe
+                salon = Salones.objects.get(nombre=salon)
+            except Salones.DoesNotExist:
+                    # el salon no existe, crear uno nuevo
+                    salon = Salones(
+                        nombre=salon,
+                        tipo=salones,
+                        capacidad=capacidad_espacios,
+                        
+                    )
+            salon.save()
             
             programacion = Programacion.objects.filter(
                 Q(programa_jornada=prog_jornada) &
@@ -584,8 +596,11 @@ def cargar_tabla(request):
                 Q(codigo_grupo=codigo_grupo) &
                 Q(cupo=cupo) &
                 Q(cupo_generico=cupo_generico) &
+                Q(salon=salon) &
                 Q(id_usuarios=user)
             ).exists()
+            
+            
             if programacion:
         # La programación ya existe, realiza la acción necesaria
         
@@ -598,11 +613,13 @@ def cargar_tabla(request):
                     codigo_grupo=codigo_grupo,
                     cupo=cupo,
                     cupo_generico=cupo_generico,
+                    salon=salon,
                     id_usuarios=user
                     
                 )
              programacion.save()
-                
+            
+            
         
         return render(request, 'cargarTabla.html')
     
@@ -1041,3 +1058,123 @@ def descargar_reporte_viewpdf(request, id_usuario):
     doc.build(elementos)
 
     return response
+
+
+
+
+
+from .models import Asistencia
+from django.shortcuts import render, redirect
+
+def asistencia(request):
+    usuarios = User.objects.filter(groups__name='Profesores')
+    semanas = range(1, 17)
+    usuario_seleccionado = request.GET.get('usuario')
+    semana_seleccionada = request.GET.get('semana')
+
+    cronogramas_asignados = Cronograma.objects.filter(id_usuarios__username=usuario_seleccionado, semana=semana_seleccionada)
+
+    if request.method == 'POST':
+        asistencias = request.POST.getlist('asistencia')
+        fecha_recuperacion = request.POST.get('fecha_recuperacion')
+        tema_clase = request.POST.get('tema_clase')
+        
+        # Obtener el objeto User correspondiente al usuario seleccionado
+        usuario = User.objects.get(username=usuario_seleccionado)
+
+        for asistencia_value in asistencias:
+            cronograma_id, asistencia_type = asistencia_value.split('-')
+
+            cronograma = Cronograma.objects.get(id=cronograma_id)
+
+            # Obtener el objeto Programacion correspondiente al usuario y asignar el salón
+            programacion = Programacion.objects.get(id_usuarios=usuario)
+            salon_asignado = programacion.salon
+
+            if asistencia_type == 'noasistio' and fecha_recuperacion:
+                # Crear el objeto Asistencia con fecha de recuperación y asignar el salón
+                asistencia = Asistencia(
+                    cronograma=cronograma,
+                    usuario=usuario,
+                    fecha=cronograma.fecha,
+                    asistio=False,
+                    noAsistio=True,
+                    fecha_recuperacion=fecha_recuperacion,
+                    
+                )
+            else:
+                # Crear el objeto Asistencia sin fecha de recuperación y asignar el salón
+                asistencia = Asistencia(
+                    cronograma=cronograma,
+                    usuario=usuario,
+                    fecha=cronograma.fecha,
+                    asistio=(asistencia_type == 'asistio'),
+                    noAsistio=(asistencia_type == 'noasistio'),
+                    tema_clase=tema_clase,
+                    salon=salon_asignado
+                )
+
+            # Guardar la asistencia
+            asistencia.save()
+
+        return redirect('asistencia')  # Redirigir a la página de asistencia después de guardar las asistencias
+
+    return render(request, 'asistencia.html', {
+        'usuarios': usuarios,
+        'semanas': semanas,
+        'usuario_seleccionado': usuario_seleccionado,
+        'semana_seleccionada': semana_seleccionada,
+        'cronogramas_asignados': cronogramas_asignados
+    })
+def tabla_asistencia(request):
+    asistencias = Asistencia.objects.filter(salon__isnull=True).exclude(fecha_recuperacion__isnull=True)
+    todos_los_salones = Salones.objects.all()
+
+    if request.method == 'POST':
+        usuario = request.POST.get('usuario')
+        if usuario:
+            asistencias = asistencias.filter(usuario=usuario)
+
+    return render(request, 'tabla_asistencia.html', {'asistencias': asistencias, 'salones': todos_los_salones, 'usuarios': asistencias.values_list('usuario', flat=True).distinct()})
+
+def guardar_salon(request):
+    if request.method == 'POST':
+        asistencia_id = request.POST.get('asistencia_id')
+        salon_id = request.POST.get('salon')
+
+        asistencia = Asistencia.objects.get(id=asistencia_id)
+        salon = Salones.objects.get(id=salon_id)
+        asistencia.salon = salon
+        asistencia.save()
+
+        asistencias = Asistencia.objects.filter(salon__isnull=True).exclude(fecha_recuperacion__isnull=True).exclude(id=asistencia_id)
+        return render(request, 'tabla_asistencia.html', {'asistencias': asistencias, 'salones': Salones.objects.all(), 'usuarios': asistencias.values_list('usuario', flat=True).distinct()})
+
+    return redirect('tabla_asistencia')
+
+
+def mostrar_tabla_asistencias(request):
+    asistencias = Asistencia.objects.all()
+    usuarios_asistencias = asistencias.values_list('usuario__username', flat=True).distinct()
+    usuarios = User.objects.filter(username__in=usuarios_asistencias)
+
+    usuario_seleccionado = request.POST.get('usuario')
+
+    if usuario_seleccionado:
+        asistencias = asistencias.filter(usuario__username=usuario_seleccionado)
+
+    context = {'asistencias': asistencias, 'usuarios': usuarios, 'usuario_seleccionado': usuario_seleccionado}
+    return render(request, 'mostrarAsistencia.html', context)
+
+def mostrar_tabla_asistencias_profesor(request):
+    usuario = request.user  # Obtener el usuario que inició sesión
+    asistencias = Asistencia.objects.filter(usuario=usuario)
+  
+
+    usuario_seleccionado = request.POST.get('usuario')
+
+    if usuario_seleccionado:
+        asistencias = asistencias.filter(usuario__username=usuario_seleccionado)
+
+    context = {'asistencias': asistencias}
+    return render(request, 'mostrarAsistenciaProfesor.html', context)

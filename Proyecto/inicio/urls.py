@@ -46,6 +46,12 @@ urlpatterns = [
     path('programaciones-asignadas', views.programaciones_asignadas_view, name='programaciones_asignadas'),
     path('descargar-reporte/<str:id_usuario>/', views.descargar_reporte_view, name='descargar_reporteExcel'),
     path('inicio/descargar-reporte/<str:id_usuario>/', views.descargar_reporte_viewpdf, name='descargar_reportePdf'),
+    path('asistencia', views.asistencia, name='asistencia'),
+    path('asignarSalon', views.tabla_asistencia, name='tabla_asistencia'),
+    path('tabla-asistencias', views.mostrar_tabla_asistencias, name='mostrarAsistencia'),
+    path('tabla-asistencias-profesor', views.mostrar_tabla_asistencias_profesor, name='mostrarAsistenciaProfesor'),
+    path('guardar-salon', views.guardar_salon, name='guardar_salon'),
+    
 
 
 

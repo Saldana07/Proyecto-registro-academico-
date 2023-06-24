@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-body">
+    <h1>ASISTENCIA COMPLETA</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2>Asistió</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered" id="dataTableAsistencias" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cronograma</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Asistió</th>
+            <th>Salon</th>
+            <th>Tema de Clase</th>
+            <th>Contenido Temático</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asistencia in asistencias %}
+          {% if asistencia.asistio %}
+          <tr>
+            <td>{{ asistencia.id }}</td>
+            <td>{{ asistencia.cronograma }}</td>
+            <td>{{ asistencia.usuario }}</td>
+            <td>{{ asistencia.fecha }}</td>
+            <td>{{ asistencia.asistio }}</td>
+            <td>{{ asistencia.salon.nombre }}</td>
+            <td>{{ asistencia.tema_clase }}</td>
+            <td>{{ asistencia.cronograma.contenido_tematico }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2>No Asistió</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered" id="dataTableNoAsistencias" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cronograma</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>No Asistió</th>
+            <th>Fecha de Recuperación</th>
+            <th>Salon</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asistencia in asistencias %}
+          {% if asistencia.noAsistio %}
+          <tr>
+            <td>{{ asistencia.id }}</td>
+            <td>{{ asistencia.cronograma }}</td>
+            <td>{{ asistencia.usuario }}</td>
+            <td>{{ asistencia.fecha }}</td>
+            <td>{{ asistencia.noAsistio }}</td>
+            <td>{{ asistencia.fecha_recuperacion }}</td>
+            <td>{{ asistencia.salon.nombre }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

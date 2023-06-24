@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h1 class="mt-4">ASISTENCIA COMPLETA</h1>
+  </div>
+
+  <div class="card-body">
+    <form method="POST" id="filtro-form" class="row align-items-center">
+      {% csrf_token %}
+      <div class="form-group col-10">
+        <label for="usuario">Usuario:</label>
+        <select name="usuario" id="usuario" class="form-control">
+          <option value="">Todos los usuarios</option>
+          {% for usuario in usuarios %}
+            <option value="{{ usuario.username }}" {% if usuario.username == usuario_seleccionado %}selected{% endif %}>{{ usuario.username }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-1">
+        <button type="submit" class="btn btn-outline-danger">Filtrar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2>Asistencias</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered" id="dataTableAsistencias" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cronograma</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Asistió</th>
+            <th>Salon</th>
+            <th>Tema de Clase</th>
+            <th>Contenido Temático</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asistencia in asistencias %}
+          {% if asistencia.asistio %}
+          <tr>
+            <td>{{ asistencia.id }}</td>
+            <td>{{ asistencia.cronograma }}</td>
+            <td>{{ asistencia.usuario }}</td>
+            <td>{{ asistencia.fecha }}</td>
+            <td>{{ asistencia.asistio }}</td>
+            <td>{{ asistencia.salon.nombre }}</td>
+            <td>{{ asistencia.tema_clase }}</td>
+            <td>{{ asistencia.cronograma.contenido_tematico }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2>No Asistencias</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered" id="dataTableNoAsistencias" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cronograma</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>No Asistió</th>
+            <th>Fecha de Recuperación</th>
+            <th>Salon</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for asistencia in asistencias %}
+          {% if asistencia.noAsistio %}
+          <tr>
+            <td>{{ asistencia.id }}</td>
+            <td>{{ asistencia.cronograma }}</td>
+            <td>{{ asistencia.usuario }}</td>
+            <td>{{ asistencia.fecha }}</td>
+            <td>{{ asistencia.noAsistio }}</td>
+            <td>{{ asistencia.fecha_recuperacion }}</td>
+            <td>{{ asistencia.salon.nombre }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

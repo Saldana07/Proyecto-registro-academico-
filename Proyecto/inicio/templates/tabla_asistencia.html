@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Tabla de Asignar salon</h1>
+  
+  
+  <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cronograma</th>
+        <th>Usuario</th>
+        <th>Fecha</th>
+        <th>Fecha de recuperación</th>
+        <th>Asignar Salón</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for asistencia in asistencias %}
+        <tr>
+          <td>{{ asistencia.id }}</td>
+          <td>{{ asistencia.cronograma }}</td>
+          <td>{{ asistencia.usuario }}</td>
+          <td>{{ asistencia.fecha }}</td>
+          <td>{{ asistencia.fecha_recuperacion }}</td>
+          <td>
+            <form action="{% url 'guardar_salon' %}" method="POST">
+              {% csrf_token %}
+              <select name="salon">
+                <option value="">Seleccionar Salón</option>
+                {% for salon in salones %}
+                  <option value="{{ salon.id }}">{{ salon.nombre }}</option>
+                {% endfor %}
+              </select>
+              <input type="hidden" name="asistencia_id" value="{{ asistencia.id }}">
+              <button type="submit">Guardar</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

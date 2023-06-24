@@ -101,7 +101,12 @@ class Restriccion(models.Model):
     fecha_fin = models.DateField()
 
 
-
+class Salones(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=300)
+    tipo = models.CharField(max_length=300)
+    capacidad = models.PositiveIntegerField(default=0) 
+    
 class Programacion(models.Model):
     id = models.AutoField(primary_key=True)
     programa_jornada = models.CharField(max_length=100)
@@ -110,6 +115,7 @@ class Programacion(models.Model):
     codigo_grupo = models.CharField(max_length=20)
     cupo = models.IntegerField()
     cupo_generico = models.IntegerField()
+    salon = models.ForeignKey(Salones, on_delete=models.SET_NULL, blank=True, null=True)
     id_usuarios = models.ForeignKey(User, on_delete=models.CASCADE)
 
     
@@ -121,7 +127,7 @@ class Cronograma(models.Model):
     id = models.AutoField(primary_key=True)  # Campo de ID autoincremental
     id_usuarios = models.ForeignKey(User, on_delete=models.CASCADE)
     semana = models.IntegerField()
-    fecha =  models.DateTimeField(auto_now_add=True)
+    fecha = models.DateField()
     contenido_tematico = models.TextField()
     material_apoyo = models.TextField()
     observaciones = models.TextField()
@@ -131,5 +137,19 @@ class Cronograma(models.Model):
     def __str__(self):
         return f"Semana {self.semana}"
     
+
     
+class Asistencia(models.Model):
+    id = models.AutoField(primary_key=True)
+    cronograma = models.ForeignKey(Cronograma, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha = models.DateField(auto_now_add=True)
+    asistio = models.BooleanField(default=False)
+    noAsistio= models.BooleanField(default=False)
+    fecha_recuperacion = models.DateField(blank=True, null=True)
+    tema_clase = models.CharField(max_length=100, blank=True, null=True)
+    salon = models.ForeignKey(Salones, on_delete=models.SET_NULL, blank=True, null=True)
+    
+    def __str__(self):
+        return f"Asistencia de {self.usuario.username} - {self.fecha}"
     

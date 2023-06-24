@@ -181,11 +181,41 @@
                         {% endif %}
                         {% if perms.sessions.view_session %}
                         <a class="collapse-item" href="{%url 'contador_registros'%}">INFORME</a>
+                      
+
                         {% endif %}
                         <!--
                         <a class="collapse-item" href="{%url 'seleccionar_fechas'%}">FECHAS</a>
 
                         -->
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages3"
+                    aria-expanded="true" aria-controls="collapsePages3">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>ASISTENCIA</span>
+                </a>
+                <div id="collapsePages3" class="collapse" aria-labelledby="headingPages3" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">ASISTENCIA</h6>
+                        {% if perms.inicio.view_disponibilidad %}
+                        <a class="collapse-item" href="{%url 'asistencia'%}">CHEQUEO ASISTENCIA</a>
+                        {% endif %}
+
+                        {% if perms.inicio.view_salones %} 
+                        <a class="collapse-item" href="{%url 'tabla_asistencia'%}">ASIGNAR SALON</a>
+                        {% endif %}
+                        {% if perms.inicio.view_restriccion  or perms.inicio.view_disponibilidad %}
+                        <a class="collapse-item" href="{%url 'mostrarAsistencia'%}">TABLA ASISTENCIA</a>
+                        {% endif %}
+
+                        {% if perms.inicio.delete_restriccion %}
+                        <a class="collapse-item" href="{%url 'mostrarAsistenciaProfesor'%}">TABLA ASISTENCIA</a>
+                        {% endif %}
+                        
+
                     </div>
                 </div>
             </li>

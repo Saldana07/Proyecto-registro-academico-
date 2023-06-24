@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+
+    <div class="card-body">
+    <h1 class="h1 seleccion-titulo">Seleccionar Usuario y Semana</h1>
+
+        <form method="GET">
+            <div class="form-row align-items-center">
+                <div class="col">
+
+                    <select name="usuario" class="form-control form-control-sm col">
+                        {% for user in usuarios %}
+                            <option value="{{ user.username }}" {% if user.username == usuario_seleccionado %}selected{% endif %}>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <select name="semana" class="form-control form-control-sm col">
+                        {% for semana in semanas %}
+                            <option value="{{ semana }}" {% if semana == semana_seleccionada %}selected{% endif %}>{{ semana }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-outline-danger float">Mostrar Cronograma</button>
+                </div>
+            </div>
+        </form>
+   
+        <div class="card-body">
+
+
+{% if usuario_seleccionado %}
+    <h2>Cronogramas asignados al usuario: {{ usuario_seleccionado }}</h2>
+    {% if cronogramas_asignados %}
+        <div class="card-body">
+            <div class="table-responsive">
+                <form method="POST" id="asistencia-form">
+                    {% csrf_token %}
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Semana</th>
+                            <th>Fecha</th>
+                            <th>Asistió</th>
+                            <th>No Asistió</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cronograma in cronogramas_asignados %}
+                            <tr>
+                                <td>Semana {{ cronograma.semana }}</td>
+                                <td>{{ cronograma.id_usuarios }}</td>
+                                <td>{{ cronograma.fecha }}</td>
+
+                                <td>
+                                    <div class="form-check">
+                                        <input type="radio" name="asistencia" value="{{ cronograma.id }}-asistio" class="form-check-input">
+                                    </div>
+
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="radio" name="asistencia" value="{{ cronograma.id }}-noasistio" class="form-check-input">
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-outline-danger float-right">Guardar</button>
+
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p>No se encontraron cronogramas asignados a este usuario.</p>
+    {% endif %}
+{% endif %}
+</div>
+</div>
+<!-- Modal de advertencia -->
+<div class="modal" id="advertenciaModal" tabindex="-1" role="dialog" aria-labelledby="advertenciaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="advertenciaModalLabel">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Por favor, seleccione una opción antes de guardar.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de fecha de recuperación -->
+
+<div class="modal" id="recuperarClaseModal" tabindex="-1" role="dialog" aria-labelledby="recuperarClaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recuperarClaseModalLabel">Recuperar Clase</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Cuándo va a recuperar la clase?</p>
+                <input type="date" id="fechaRecuperacion" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger float-right" id="guardarRecuperacionBtn">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de tema de clase -->
+<div class="modal" id="temaClaseModal" tabindex="-1" role="dialog" aria-labelledby="temaClaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="temaClaseModalLabel">Tema de la Clase</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Ingrese el tema de la clase:</p>
+                <input type="text" id="temaClaseInput" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger float-right" id="guardarTemaBtn">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('asistencia-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Evitar el envío del formulario
+
+        var checkboxes = document.getElementsByName('asistencia');
+        var asistioChecked = false;
+        var noAsistioChecked = false;
+
+        // Verificar si se ha seleccionado la opción "Asistió" o "No Asistió"
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].value.endsWith('-asistio') && checkboxes[i].checked) {
+                asistioChecked = true;
+            } else if (checkboxes[i].value.endsWith('-noasistio') && checkboxes[i].checked) {
+                noAsistioChecked = true;
+            }
+        }
+
+        // Mostrar el modal de advertencia si no se seleccionó ninguna opción
+        if (!asistioChecked && !noAsistioChecked) {
+            $('#advertenciaModal').modal('show');
+        } else if (asistioChecked) {
+            // Mostrar el modal de tema de la clase si se seleccionó "Asistió"
+            $('#temaClaseModal').modal('show');
+        } else if (noAsistioChecked) {
+            // Mostrar el modal de recuperación si se seleccionó "No Asistió"
+            $('#recuperarClaseModal').modal('show');
+        }
+    });
+
+    document.getElementById('guardarTemaBtn').addEventListener('click', function() {
+        var temaClase = document.getElementById('temaClaseInput').value;
+
+        // Guardar el tema de la clase en un campo oculto del formulario
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'tema_clase';
+        hiddenInput.value = temaClase;
+        document.getElementById('asistencia-form').appendChild(hiddenInput);
+
+        document.getElementById('asistencia-form').submit(); // Enviar el formulario
+    });
+
+    document.getElementById('guardarRecuperacionBtn').addEventListener('click', function() {
+        var fechaRecuperacion = document.getElementById('fechaRecuperacion').value;
+
+        // Guardar la fecha de recuperación en un campo oculto del formulario
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'fecha_recuperacion';
+        hiddenInput.value = fechaRecuperacion;
+        document.getElementById('asistencia-form').appendChild(hiddenInput);
+
+        document.getElementById('asistencia-form').submit(); // Enviar el formulario
+    });
+</script>
+{% endblock %}
