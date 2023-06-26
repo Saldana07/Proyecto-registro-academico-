@@ -209,10 +209,13 @@
                         {% endif %}
                         {% if perms.inicio.view_restriccion  or perms.inicio.view_disponibilidad %}
                         <a class="collapse-item" href="{%url 'mostrarAsistencia'%}">TABLA ASISTENCIA</a>
+
                         {% endif %}
 
                         {% if perms.inicio.delete_restriccion %}
                         <a class="collapse-item" href="{%url 'mostrarAsistenciaProfesor'%}">TABLA ASISTENCIA</a>
+                        <a class="collapse-item" href="{%url 'asistenciaProfesor'%}">LLENAR ASISTENCIA</a>
+
                         {% endif %}
                         
 

@@ -51,7 +51,7 @@ urlpatterns = [
     path('tabla-asistencias', views.mostrar_tabla_asistencias, name='mostrarAsistencia'),
     path('tabla-asistencias-profesor', views.mostrar_tabla_asistencias_profesor, name='mostrarAsistenciaProfesor'),
     path('guardar-salon', views.guardar_salon, name='guardar_salon'),
-    
+    path('asistenciaProfesores', views.asistenciaProfesor, name='asistenciaProfesor'),
 
 
 

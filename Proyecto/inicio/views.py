@@ -1126,6 +1126,9 @@ def asistencia(request):
         'semana_seleccionada': semana_seleccionada,
         'cronogramas_asignados': cronogramas_asignados
     })
+    
+    
+
 def tabla_asistencia(request):
     asistencias = Asistencia.objects.filter(salon__isnull=True).exclude(fecha_recuperacion__isnull=True)
     todos_los_salones = Salones.objects.all()
@@ -1178,3 +1181,65 @@ def mostrar_tabla_asistencias_profesor(request):
 
     context = {'asistencias': asistencias}
     return render(request, 'mostrarAsistenciaProfesor.html', context)
+
+
+
+
+
+
+def asistenciaProfesor(request):
+    # Obtener el usuario que inició sesión
+    usuario_actual = request.user
+
+    semanas = range(1, 17)
+    semana_seleccionada = request.GET.get('semana')
+
+    cronogramas_asignados = Cronograma.objects.filter(id_usuarios__username=usuario_actual.username, semana=semana_seleccionada)
+
+    if request.method == 'POST':
+            asistencias = request.POST.getlist('asistencia')
+            fecha_recuperacion = request.POST.get('fecha_recuperacion')
+            tema_clase = request.POST.get('tema_clase')
+
+            for asistencia_value in asistencias:
+                cronograma_id, asistencia_type = asistencia_value.split('-')
+
+                cronograma = Cronograma.objects.get(id=cronograma_id)
+
+                # Obtener el objeto Programacion correspondiente al usuario y asignar el salón
+                programacion = Programacion.objects.get(id_usuarios=usuario_actual)
+                salon_asignado = programacion.salon
+
+                if asistencia_type == 'noasistio' and fecha_recuperacion:
+                    # Crear el objeto Asistencia con fecha de recuperación y asignar el salón
+                    asistencia = Asistencia(
+                        cronograma=cronograma,
+                        usuario=usuario_actual,
+                        fecha=cronograma.fecha,
+                        asistio=False,
+                        noAsistio=True,
+                        fecha_recuperacion=fecha_recuperacion,
+                    )
+                else:
+                    # Crear el objeto Asistencia sin fecha de recuperación y asignar el salón
+                    asistencia = Asistencia(
+                        cronograma=cronograma,
+                        usuario=usuario_actual,
+                        fecha=cronograma.fecha,
+                        asistio=(asistencia_type == 'asistio'),
+                        noAsistio=(asistencia_type == 'noasistio'),
+                        tema_clase=tema_clase,
+                        salon=salon_asignado
+                    )
+
+                # Guardar la asistencia
+                asistencia.save()
+
+            return redirect('asistenciaProfesor')  # Redirigir a la página de asistencia después de guardar las asistencias
+
+    return render(request, 'asistenciaProfesor.html', {
+            'semanas': semanas,
+            'semana_seleccionada': semana_seleccionada,
+            'cronogramas_asignados': cronogramas_asignados
+        })
+    
